@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Sales Trainer: Kontext & Prompting</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; color: #1a202c; padding: 20px; max-width: 900px; margin: 0 auto; }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        h1 { color: #2b6cb0; margin-bottom: 5px; }
+        .subtitle { color: #718096; margin-bottom: 25px; }
+        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        
+        label { font-weight: 600; display: block; margin-bottom: 8px; color: #4a5568; }
+        textarea, select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px; font-family: inherit; transition: border 0.2s; }
+        textarea:focus, select:focus { border-color: #3182ce; outline: none; }
+        textarea { height: 100px; resize: vertical; }
+
+        button { width: 100%; padding: 15px; background: #3182ce; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.2s; margin-top: 10px; }
+        button:hover { background: #2c5282; }
+
+        .output-area { margin-top: 30px; display: none; animation: slideUp 0.4s ease-out; }
+        
+        .card { background: #ebf8ff; border-left: 5px solid #3182ce; padding: 20px; border-radius: 4px; margin-bottom: 20px; }
+        .card h3 { margin-top: 0; color: #2c5282; display: flex; align-items: center; gap: 10px; }
+        
+        .prompt-box { background: #2d3748; color: #a0aec0; padding: 15px; border-radius: 6px; font-family: monospace; white-space: pre-wrap; position: relative; }
+        .prompt-text { color: #48bb78; } /* Grün für den dynamischen Teil */
+        .copy-hint { position: absolute; right: 10px; top: 10px; font-size: 12px; opacity: 0.7; }
+
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 12px; background: #bee3f8; color: #2c5282; margin-right: 5px; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🚀 AI Sales Context Trainer</h1>
+        <p class="subtitle">Lerne, wie du KI-Tools basierend auf Persona und Verkaufsphase richtig steuerst.</p>
+
+        <div class="grid">
+            <div>
+                <label>1. Wer ist dein Gesprächspartner?</label>
+                <select id="persona">
+                    <option value="techniker">CTO / Tech Lead (Technischer Fokus)</option>
+                    <option value="manager">CFO / Einkauf (Budget & ROI Fokus)</option>
+                    <option value="nutzer">Endanwender (Usability Fokus)</option>
+                </select>
+            </div>
+            <div>
+                <label>2. In welcher Phase seid ihr?</label>
+                <select id="phase">
+                    <option value="kaltakquise">Kaltakquise / Erste E-Mail</option>
+                    <option value="einwand">Einwandbehandlung (Objection Handling)</option>
+                    <option value="closing">Verhandlung / Closing</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label>3. Was ist die Situation / Der Input vom Kunden?</label>
+            <textarea id="customerInput" placeholder="z.B.: 'Eure Lösung sieht gut aus, ist aber im Vergleich zum Wettbewerb zu teuer.'">Zu teuer im Vergleich zum Wettbewerb.</textarea>
+        </div>
+
+        <button onclick="generateStrategy()">🔮 Generiere KI-Strategie & Prompt</button>
+
+        <div id="output" class="output-area">
+            
+            <div class="card">
+                <h3>🧠 Die Kontext-Analyse</h3>
+                <p id="strategyText">Hier erscheint die Erklärung...</p>
+                <div style="margin-top:10px;">
+                    <span class="badge" id="badgePersona">Persona</span>
+                    <span class="badge" id="badgePhase">Phase</span>
+                </div>
+            </div>
+
+            <div class="card" style="background: #f0fff4; border-color: #38a169;">
+                <h3>⌨️ Dein perfekter Prompt für ChatGPT/Claude</h3>
+                <p>Kopiere das in dein KI-Tool, um das beste Ergebnis zu erhalten:</p>
+                <div class="prompt-box">
+                    <span class="copy-hint">Simuliert</span>
+                    Du bist ein erfahrener B2B Sales Coach. <br><br>
+                    <strong>Kontext:</strong> <span id="promptContext" class="prompt-text">...</span><br>
+                    <strong>Aufgabe:</strong> <span id="promptTask" class="prompt-text">...</span><br>
+                    <strong>Tonalität:</strong> <span id="promptTone" class="prompt-text">...</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function generateStrategy() {
+            const persona = document.getElementById('persona').value;
+            const phase = document.getElementById('phase').value;
+            const input = document.getElementById('customerInput').value;
+            
+            const outputDiv = document.getElementById('output');
+            const strategyText = document.getElementById('strategyText');
+            const promptContext = document.getElementById('promptContext');
+            const promptTask = document.getElementById('promptTask');
+            const promptTone = document.getElementById('promptTone');
+
+            // Simuliertes "Sales Wissen"
+            let strategy = "";
+            let aiContext = "";
+            let aiTask = "";
+            let aiTone = "";
+
+            // 1. Analyse der Persona
+            if (persona === "techniker") {
+                strategy = "Bei Technikern müssen wir 'Fluff' vermeiden. Keine Buzzwords. Fokus auf Integration, Sicherheit und API-Fähigkeiten. ";
+                aiTone = "Präzise, technisch fundiert, ohne Marketing-Sprech.";
+            } else if (persona === "manager") {
+                strategy = "Bei Entscheidern (CFO/Einkauf) zählt nur der Business Case. Wir müssen Risiko minimieren und ROI aufzeigen. ";
+                aiTone = "Professionell, wirtschaftlich orientiert, kurz und knapp.";
+            } else {
+                strategy = "Der Endanwender will wissen: 'Macht das meinen Alltag leichter?'. Wir fokussieren uns auf Zeitersparnis und Einfachheit. ";
+                aiTone = "Empathisch, lösungsorientiert, verständlich.";
+            }
+
+            // 2. Analyse der Phase + Input
+            if (phase === "kaltakquise") {
+                strategy += "Da wir in der Kaltakquise sind, dürfen wir nicht sofort 'verkaufen'. Ziel ist Interesse wecken durch ein relevantes Problem.";
+                aiContext = `Ich schreibe eine erste E-Mail an einen ${persona.toUpperCase()}. Thema: "${input}".`;
+                aiTask = `Erstelle 3 Betreffzeilen und einen kurzen E-Mail-Körper (max. 100 Wörter), der ein Problem anspricht ("Pain Point"), statt Funktionen aufzuzählen.`;
+            } else if (phase === "einwand") {
+                strategy += "Bei Einwänden validieren wir erst das Gefühl des Kunden ('Ich verstehe...'), bevor wir argumentieren (LACE-Methode).";
+                aiContext = `Der Kunde (${persona.toUpperCase()}) hat folgenden Einwand geäußert: "${input}".`;
+                aiTask = `Formuliere eine Antwort nach der LACE-Methode (Listen, Accept, Commit, Explore). Widerlege den Einwand nicht direkt, sondern refraime ihn basierend auf ${persona === 'manager' ? 'Kostenersparnis' : 'technischer Überlegenheit'}.`;
+            } else { // Closing
+                strategy += "Im Closing geht es um Verbindlichkeit. Wir brauchen einen klaren 'Next Step' oder die Unterschrift. Keine neuen Features mehr vorstellen!";
+                aiContext = `Wir sind kurz vor dem Abschluss mit einem ${persona.toUpperCase()}. Letzter Punkt: "${input}".`;
+                aiTask = `Erstelle eine kurze, verbindliche Nachricht, die letzte Hürden ausräumt und direkt nach einem Termin für die Unterschrift oder einem Zeitplan fragt.`;
+            }
+
+            // Update UI
+            strategyText.innerHTML = strategy;
+            document.getElementById('badgePersona').innerText = "Zielgruppe: " + persona.toUpperCase();
+            document.getElementById('badgePhase').innerText = "Phase: " + phase.toUpperCase();
+
+            promptContext.innerText = aiContext;
+            promptTask.innerText = aiTask;
+            promptTone.innerText = aiTone;
+
+            outputDiv.style.display = "block";
+            
+            // Smooth scroll
+            outputDiv.scrollIntoView({behavior: "smooth"});
+        }
+    </script>
+</body>
+</html>
