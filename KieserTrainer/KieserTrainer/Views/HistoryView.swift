@@ -76,6 +76,11 @@ struct HistoryView: View {
                 }
             }
             .navigationTitle("Verlauf")
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    EditButton()
+                }
+            }
         }
     }
 
@@ -144,7 +149,10 @@ struct SessionRowView: View {
 }
 
 struct SessionDetailView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
     let session: WorkoutSession
+    @State private var showingDeleteConfirmation = false
 
     var sortedLogs: [ExerciseLog] {
         session.exerciseLogs.sorted { $0.date < $1.date }
@@ -223,9 +231,30 @@ struct SessionDetailView: View {
                         .foregroundStyle(.secondary)
                 }
             }
+
+            Section {
+                Button(role: .destructive) {
+                    showingDeleteConfirmation = true
+                } label: {
+                    HStack {
+                        Spacer()
+                        Label("Training löschen", systemImage: "trash")
+                        Spacer()
+                    }
+                }
+            }
         }
         .navigationTitle("Training Details")
         .navigationBarTitleDisplayMode(.inline)
+        .confirmationDialog("Training löschen?", isPresented: $showingDeleteConfirmation, titleVisibility: .visible) {
+            Button("Löschen", role: .destructive) {
+                modelContext.delete(session)
+                dismiss()
+            }
+            Button("Abbrechen", role: .cancel) { }
+        } message: {
+            Text("Dieses Training und alle zugehörigen Daten werden unwiderruflich gelöscht.")
+        }
     }
 }
 
