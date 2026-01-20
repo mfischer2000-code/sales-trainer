@@ -13,8 +13,7 @@ struct WorkoutStartView: View {
     @Query(filter: #Predicate<Exercise> { $0.isActive }, sort: \Exercise.orderIndex) private var activeExercises: [Exercise]
     @Query(filter: #Predicate<WorkoutSession> { !$0.isCompleted }) private var activeSessions: [WorkoutSession]
 
-    @State private var showingWorkout = false
-    @State private var currentSession: WorkoutSession?
+    @State private var presentedSession: WorkoutSession?
 
     var lastCompletedSession: WorkoutSession? {
         // Würde normalerweise eine Query sein, aber für die Preview vereinfacht
@@ -48,10 +47,8 @@ struct WorkoutStartView: View {
                 .padding()
             }
             .navigationTitle("Kieser Training")
-            .fullScreenCover(isPresented: $showingWorkout) {
-                if let session = currentSession {
-                    ActiveWorkoutView(session: session)
-                }
+            .fullScreenCover(item: $presentedSession) { session in
+                ActiveWorkoutView(session: session)
             }
         }
     }
@@ -99,8 +96,7 @@ struct WorkoutStartView: View {
             .foregroundStyle(.secondary)
 
             Button(action: {
-                currentSession = session
-                showingWorkout = true
+                presentedSession = session
             }) {
                 Text("Fortsetzen")
                     .font(.headline)
@@ -224,8 +220,7 @@ struct WorkoutStartView: View {
     private func startNewWorkout() {
         let session = WorkoutSession()
         modelContext.insert(session)
-        currentSession = session
-        showingWorkout = true
+        presentedSession = session
     }
 }
 
