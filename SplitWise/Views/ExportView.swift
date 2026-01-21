@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// View für den Export von Berichten als PDF/CSV
+/// View für den Export von Berichten als PDF/CSV 📤
 struct ExportView: View {
     let group: Group
     @EnvironmentObject var dataManager: DataManager
@@ -18,8 +18,8 @@ struct ExportView: View {
 
         var icon: String {
             switch self {
-            case .pdf: return "doc.fill"
-            case .csv: return "tablecells"
+            case .pdf: return "📄"
+            case .csv: return "📊"
             }
         }
 
@@ -41,120 +41,130 @@ struct ExportView: View {
 
     var body: some View {
         NavigationView {
-            VStack(spacing: 20) {
-                // Header
-                VStack(spacing: 8) {
-                    Image(systemName: "square.and.arrow.up.fill")
-                        .font(.system(size: 50))
-                        .foregroundColor(.blue)
+            ZStack {
+                BeerPatternBackground()
 
-                    Text("Bericht exportieren")
-                        .font(.title2)
-                        .fontWeight(.bold)
+                VStack(spacing: 20) {
+                    // Header
+                    VStack(spacing: 12) {
+                        Text("📤")
+                            .font(.system(size: 60))
 
-                    Text(group.name)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                .padding(.top, 20)
+                        Text("Bericht exportieren")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.n26TextPrimary)
 
-                // Format Auswahl
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Format wählen")
-                        .font(.headline)
-                        .padding(.horizontal)
-
-                    ForEach(ExportFormat.allCases, id: \.self) { format in
-                        Button(action: { selectedFormat = format }) {
-                            HStack(spacing: 16) {
-                                Image(systemName: format.icon)
-                                    .font(.title2)
-                                    .foregroundColor(.blue)
-                                    .frame(width: 40)
-
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(format.rawValue)
-                                        .font(.headline)
-                                        .foregroundColor(.primary)
-
-                                    Text(format.description)
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
-
-                                Spacer()
-
-                                if selectedFormat == format {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(.blue)
-                                        .font(.title2)
-                                }
-                            }
-                            .padding()
-                            .background(selectedFormat == format ? Color.blue.opacity(0.1) : Color(.systemGray6))
-                            .cornerRadius(12)
+                        HStack {
+                            Text(group.type.icon)
+                            Text(group.name)
                         }
-                        .buttonStyle(.plain)
-                    }
-                }
-                .padding(.horizontal)
-
-                // Export Info
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Inhalt des Berichts:")
                         .font(.subheadline)
-                        .fontWeight(.semibold)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        ExportInfoRow(icon: "person.3", text: "\(group.participants.count) Teilnehmer")
-                        ExportInfoRow(icon: "creditcard", text: "\(group.expenses.count) Ausgaben")
-                        ExportInfoRow(icon: "arrow.left.arrow.right", text: "\(settlements.count) Ausgleichszahlungen")
-                        ExportInfoRow(icon: "chart.bar", text: "Statistiken & Salden")
+                        .foregroundColor(.n26TextSecondary)
                     }
-                }
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(12)
-                .padding(.horizontal)
+                    .padding(.top, 20)
 
-                Spacer()
+                    // Format Selection
+                    N26SectionHeader("Format wählen", icon: "📋")
 
-                // Error Message
-                if let error = errorMessage {
-                    Text(error)
-                        .foregroundColor(.red)
+                    VStack(spacing: 12) {
+                        ForEach(ExportFormat.allCases, id: \.self) { format in
+                            Button(action: { selectedFormat = format }) {
+                                HStack(spacing: 16) {
+                                    Text(format.icon)
+                                        .font(.title)
+                                        .frame(width: 44)
+
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(format.rawValue)
+                                            .font(.headline)
+                                            .foregroundColor(.n26TextPrimary)
+
+                                        Text(format.description)
+                                            .font(.caption)
+                                            .foregroundColor(.n26TextSecondary)
+                                    }
+
+                                    Spacer()
+
+                                    if selectedFormat == format {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundColor(.n26Teal)
+                                            .font(.title2)
+                                    } else {
+                                        Image(systemName: "circle")
+                                            .foregroundColor(.n26TextMuted)
+                                            .font(.title2)
+                                    }
+                                }
+                                .padding()
+                                .background(selectedFormat == format ? Color.n26Teal.opacity(0.15) : Color.n26CardBackground)
+                                .cornerRadius(16)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.horizontal)
+
+                    // Export Info
+                    N26SectionHeader("Inhalt des Berichts", icon: "📦")
+
+                    VStack(spacing: 0) {
+                        ExportInfoRowN26(icon: "👥", text: "\(group.participants.count) Teilnehmer")
+                        Divider().background(Color.n26Divider)
+                        ExportInfoRowN26(icon: "💳", text: "\(group.expenses.count) Ausgaben")
+                        Divider().background(Color.n26Divider)
+                        ExportInfoRowN26(icon: "💸", text: "\(settlements.count) Ausgleichszahlungen")
+                        Divider().background(Color.n26Divider)
+                        ExportInfoRowN26(icon: "📊", text: "Statistiken & Salden")
+                    }
+                    .background(Color.n26CardBackground)
+                    .cornerRadius(16)
+                    .padding(.horizontal)
+
+                    Spacer()
+
+                    // Error Message
+                    if let error = errorMessage {
+                        HStack {
+                            Text("⚠️")
+                            Text(error)
+                        }
+                        .foregroundColor(.n26Error)
                         .font(.caption)
                         .padding()
-                }
-
-                // Export Button
-                Button(action: performExport) {
-                    HStack {
-                        if isExporting {
-                            ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        } else {
-                            Image(systemName: "square.and.arrow.up")
-                        }
-                        Text(isExporting ? "Wird erstellt..." : "Exportieren")
+                        .background(Color.n26Error.opacity(0.15))
+                        .cornerRadius(12)
+                        .padding(.horizontal)
                     }
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(isExporting ? Color.gray : Color.blue)
-                    .cornerRadius(12)
+
+                    // Export Button
+                    Button(action: performExport) {
+                        HStack {
+                            if isExporting {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .black))
+                            } else {
+                                Text("📤")
+                            }
+                            Text(isExporting ? "Wird erstellt..." : "Exportieren")
+                        }
+                    }
+                    .buttonStyle(N26ButtonStyle(isPrimary: !isExporting))
+                    .disabled(isExporting)
+                    .padding(.horizontal)
+                    .padding(.bottom)
                 }
-                .disabled(isExporting)
-                .padding(.horizontal)
-                .padding(.bottom)
             }
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(Color.n26Background, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Abbrechen") {
                         dismiss()
                     }
+                    .foregroundColor(.n26TextSecondary)
                 }
             }
             .sheet(isPresented: $showingShareSheet) {
@@ -163,6 +173,7 @@ struct ExportView: View {
                 }
             }
         }
+        .preferredColorScheme(.dark)
     }
 
     private func performExport() {
@@ -203,20 +214,21 @@ struct ExportView: View {
     }
 }
 
-struct ExportInfoRow: View {
+struct ExportInfoRowN26: View {
     let icon: String
     let text: String
 
     var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .frame(width: 20)
+        HStack(spacing: 12) {
+            Text(icon)
+                .font(.title2)
+                .frame(width: 30)
             Text(text)
-                .font(.caption)
-                .foregroundColor(.secondary)
+                .font(.subheadline)
+                .foregroundColor(.n26TextPrimary)
+            Spacer()
         }
+        .padding()
     }
 }
 

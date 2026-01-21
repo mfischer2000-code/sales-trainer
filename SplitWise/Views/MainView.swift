@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Hauptansicht der App mit Tab-Navigation
+/// Hauptansicht der App mit Tab-Navigation 🍺
 struct MainView: View {
     @EnvironmentObject var dataManager: DataManager
     @State private var selectedTab = 0
@@ -21,20 +21,20 @@ struct MainView: View {
 
             SettingsView()
                 .tabItem {
-                    Label("Einstellungen", systemImage: "gear")
+                    Label("Settings", systemImage: "gear")
                 }
                 .tag(2)
         }
-        .accentColor(.blue)
+        .accentColor(.n26Teal)
+        .preferredColorScheme(.dark)
     }
 }
 
-// MARK: - Groups List View
+// MARK: - Groups List View 👥
 
 struct GroupsListView: View {
     @EnvironmentObject var dataManager: DataManager
     @State private var showingCreateGroup = false
-    @State private var showingArchivedGroups = false
 
     var activeGroups: [Group] {
         dataManager.groups.filter { !$0.isArchived }
@@ -46,44 +46,84 @@ struct GroupsListView: View {
 
     var body: some View {
         NavigationView {
-            List {
-                if activeGroups.isEmpty {
-                    EmptyGroupsView(showingCreateGroup: $showingCreateGroup)
-                } else {
-                    ForEach(activeGroups) { group in
-                        NavigationLink(destination: GroupDetailView(group: group)) {
-                            GroupRowView(group: group)
-                        }
-                    }
-                    .onDelete(perform: deleteGroups)
-                }
+            ZStack {
+                BeerPatternBackground()
 
-                if !archivedGroups.isEmpty {
-                    Section {
-                        DisclosureGroup("Archivierte Gruppen (\(archivedGroups.count))") {
-                            ForEach(archivedGroups) { group in
+                ScrollView {
+                    VStack(spacing: 16) {
+                        if activeGroups.isEmpty {
+                            EmptyGroupsView(showingCreateGroup: $showingCreateGroup)
+                                .padding(.top, 60)
+                        } else {
+                            // Header Stats
+                            HStack(spacing: 16) {
+                                StatCard(
+                                    icon: "🍻",
+                                    value: "\(activeGroups.count)",
+                                    label: "Gruppen"
+                                )
+                                StatCard(
+                                    icon: "👥",
+                                    value: "\(activeGroups.reduce(0) { $0 + $1.participants.count })",
+                                    label: "Teilnehmer"
+                                )
+                                StatCard(
+                                    icon: "💰",
+                                    value: "\(String(format: "%.0f", activeGroups.reduce(0) { $0 + $1.totalExpenses }))€",
+                                    label: "Gesamt"
+                                )
+                            }
+                            .padding(.horizontal)
+                            .padding(.top, 8)
+
+                            // Groups List
+                            N26SectionHeader("Aktive Gruppen", icon: "📋")
+
+                            ForEach(activeGroups) { group in
                                 NavigationLink(destination: GroupDetailView(group: group)) {
                                     GroupRowView(group: group)
-                                        .opacity(0.6)
+                                }
+                                .buttonStyle(.plain)
+                                .padding(.horizontal)
+                            }
+
+                            // Archived Groups
+                            if !archivedGroups.isEmpty {
+                                N26SectionHeader("Archiv", icon: "📦")
+
+                                ForEach(archivedGroups) { group in
+                                    NavigationLink(destination: GroupDetailView(group: group)) {
+                                        GroupRowView(group: group)
+                                            .opacity(0.6)
+                                    }
+                                    .buttonStyle(.plain)
+                                    .padding(.horizontal)
                                 }
                             }
                         }
                     }
+                    .padding(.bottom, 100)
                 }
             }
-            .navigationTitle("Gruppen")
+            .navigationTitle("🍺 SplitWise")
+            .navigationBarTitleDisplayMode(.large)
+            .toolbarBackground(Color.n26Background, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showingCreateGroup = true }) {
                         Image(systemName: "plus.circle.fill")
                             .font(.title2)
+                            .foregroundColor(.n26Teal)
                     }
                 }
 
                 ToolbarItem(placement: .navigationBarLeading) {
                     if dataManager.groups.isEmpty {
-                        Button("Demo laden") {
-                            dataManager.createDemoData()
+                        Button(action: { dataManager.createDemoData() }) {
+                            Text("Demo 🎲")
+                                .font(.subheadline)
+                                .foregroundColor(.n26Teal)
                         }
                     }
                 }
@@ -92,16 +132,37 @@ struct GroupsListView: View {
                 CreateGroupView()
             }
         }
-    }
-
-    private func deleteGroups(at offsets: IndexSet) {
-        for index in offsets {
-            dataManager.deleteGroup(activeGroups[index])
-        }
+        .navigationViewStyle(.stack)
     }
 }
 
-// MARK: - Group Row View
+// MARK: - Stat Card
+
+struct StatCard: View {
+    let icon: String
+    let value: String
+    let label: String
+
+    var body: some View {
+        VStack(spacing: 6) {
+            Text(icon)
+                .font(.title2)
+            Text(value)
+                .font(.headline)
+                .fontWeight(.bold)
+                .foregroundColor(.n26TextPrimary)
+            Text(label)
+                .font(.caption)
+                .foregroundColor(.n26TextSecondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 16)
+        .background(Color.n26CardBackground)
+        .cornerRadius(16)
+    }
+}
+
+// MARK: - Group Row View 📋
 
 struct GroupRowView: View {
     let group: Group
@@ -116,78 +177,94 @@ struct GroupRowView: View {
     }
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 16) {
             // Icon
             Text(group.type.icon)
-                .font(.largeTitle)
-                .frame(width: 50, height: 50)
-                .background(Color.blue.opacity(0.1))
-                .cornerRadius(10)
+                .font(.system(size: 32))
+                .frame(width: 56, height: 56)
+                .background(Color.n26Teal.opacity(0.15))
+                .cornerRadius(14)
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text(group.name)
                     .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.n26TextPrimary)
 
-                HStack(spacing: 8) {
-                    Label("\(group.participants.count)", systemImage: "person.2")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                HStack(spacing: 12) {
+                    HStack(spacing: 4) {
+                        Text("👥")
+                        Text("\(group.participants.count)")
+                    }
+                    .font(.caption)
+                    .foregroundColor(.n26TextSecondary)
 
-                    Label("\(String(format: "%.2f", group.totalExpenses))\(group.currency)", systemImage: "banknote")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    HStack(spacing: 4) {
+                        Text("💰")
+                        Text("\(String(format: "%.2f", group.totalExpenses))\(group.currency)")
+                    }
+                    .font(.caption)
+                    .foregroundColor(.n26TextSecondary)
                 }
 
                 if pendingSettlements > 0 {
-                    Text("\(pendingSettlements) offene Zahlung\(pendingSettlements == 1 ? "" : "en")")
-                        .font(.caption)
-                        .foregroundColor(.orange)
+                    HStack(spacing: 4) {
+                        Text("⚡")
+                        Text("\(pendingSettlements) offene Zahlung\(pendingSettlements == 1 ? "" : "en")")
+                    }
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundColor(.n26Warning)
                 }
             }
 
             Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundColor(.n26TextMuted)
         }
-        .padding(.vertical, 4)
+        .padding()
+        .background(Color.n26CardBackground)
+        .cornerRadius(16)
     }
 }
 
-// MARK: - Empty Groups View
+// MARK: - Empty Groups View 🍺
 
 struct EmptyGroupsView: View {
     @Binding var showingCreateGroup: Bool
 
     var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "person.3.fill")
-                .font(.system(size: 60))
-                .foregroundColor(.blue.opacity(0.5))
+        VStack(spacing: 24) {
+            Text("🍻")
+                .font(.system(size: 80))
 
             Text("Keine Gruppen")
-                .font(.title2)
-                .fontWeight(.semibold)
+                .font(.title)
+                .fontWeight(.bold)
+                .foregroundColor(.n26TextPrimary)
 
-            Text("Erstelle eine neue Gruppe für deine Reise, WG oder dein Event.")
+            Text("Erstelle eine neue Gruppe für deine\nReise, WG oder dein Event! 🎉")
                 .font(.body)
-                .foregroundColor(.secondary)
+                .foregroundColor(.n26TextSecondary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal)
 
             Button(action: { showingCreateGroup = true }) {
-                Label("Gruppe erstellen", systemImage: "plus")
-                    .font(.headline)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
+                HStack {
+                    Image(systemName: "plus")
+                    Text("Gruppe erstellen")
+                }
             }
+            .buttonStyle(N26ButtonStyle())
             .padding(.horizontal, 40)
+            .padding(.top, 8)
         }
-        .padding(.vertical, 40)
+        .padding(.horizontal)
     }
 }
 
-// MARK: - All Expenses View
+// MARK: - All Expenses View 💳
 
 struct AllExpensesView: View {
     @EnvironmentObject var dataManager: DataManager
@@ -204,30 +281,43 @@ struct AllExpensesView: View {
 
     var body: some View {
         NavigationView {
-            List {
+            ZStack {
+                BeerPatternBackground()
+
                 if allExpenses.isEmpty {
-                    VStack(spacing: 16) {
-                        Image(systemName: "creditcard")
-                            .font(.system(size: 50))
-                            .foregroundColor(.gray.opacity(0.5))
+                    VStack(spacing: 20) {
+                        Text("💳")
+                            .font(.system(size: 60))
                         Text("Noch keine Ausgaben")
                             .font(.headline)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.n26TextSecondary)
+                        Text("Füge Ausgaben in einer Gruppe hinzu")
+                            .font(.subheadline)
+                            .foregroundColor(.n26TextMuted)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 40)
                 } else {
-                    ForEach(allExpenses, id: \.expense.id) { item in
-                        ExpenseRowView(expense: item.expense, group: item.group, showGroupName: true)
+                    ScrollView {
+                        LazyVStack(spacing: 12) {
+                            ForEach(allExpenses, id: \.expense.id) { item in
+                                ExpenseRowView(expense: item.expense, group: item.group, showGroupName: true)
+                                    .padding(.horizontal)
+                            }
+                        }
+                        .padding(.top, 16)
+                        .padding(.bottom, 100)
                     }
                 }
             }
-            .navigationTitle("Alle Ausgaben")
+            .navigationTitle("💳 Ausgaben")
+            .navigationBarTitleDisplayMode(.large)
+            .toolbarBackground(Color.n26Background, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
         }
+        .navigationViewStyle(.stack)
     }
 }
 
-// MARK: - Settings View
+// MARK: - Settings View ⚙️
 
 struct SettingsView: View {
     @EnvironmentObject var dataManager: DataManager
@@ -235,72 +325,159 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationView {
-            Form {
-                Section(header: Text("Premium")) {
-                    if dataManager.isPremiumUser {
-                        HStack {
-                            Image(systemName: "checkmark.seal.fill")
-                                .foregroundColor(.green)
-                            Text("Premium aktiv")
-                        }
-                    } else {
-                        Button(action: { showingPremiumAlert = true }) {
-                            HStack {
-                                Image(systemName: "star.fill")
-                                    .foregroundColor(.yellow)
-                                Text("Premium freischalten")
-                                Spacer()
-                                Text("PDF/CSV Export")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+            ZStack {
+                BeerPatternBackground()
+
+                ScrollView {
+                    VStack(spacing: 16) {
+                        // Premium Section
+                        N26SectionHeader("Premium", icon: "⭐")
+
+                        VStack(spacing: 0) {
+                            if dataManager.isPremiumUser {
+                                HStack {
+                                    Text("✅")
+                                        .font(.title2)
+                                    VStack(alignment: .leading) {
+                                        Text("Premium aktiv")
+                                            .font(.headline)
+                                            .foregroundColor(.n26Success)
+                                        Text("PDF & CSV Export freigeschaltet")
+                                            .font(.caption)
+                                            .foregroundColor(.n26TextSecondary)
+                                    }
+                                    Spacer()
+                                }
+                                .padding()
+                            } else {
+                                Button(action: { showingPremiumAlert = true }) {
+                                    HStack {
+                                        Text("⭐")
+                                            .font(.title2)
+                                        VStack(alignment: .leading) {
+                                            Text("Premium freischalten")
+                                                .font(.headline)
+                                                .foregroundColor(.n26TextPrimary)
+                                            Text("PDF/CSV Export aktivieren")
+                                                .font(.caption)
+                                                .foregroundColor(.n26TextSecondary)
+                                        }
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .foregroundColor(.n26TextMuted)
+                                    }
+                                    .padding()
+                                }
                             }
                         }
-                    }
-                }
+                        .background(Color.n26CardBackground)
+                        .cornerRadius(16)
+                        .padding(.horizontal)
 
-                Section(header: Text("Info")) {
-                    HStack {
-                        Text("Version")
-                        Spacer()
-                        Text("1.0.0")
-                            .foregroundColor(.secondary)
-                    }
+                        // Info Section
+                        N26SectionHeader("Info", icon: "ℹ️")
 
-                    HStack {
-                        Text("Gruppen")
-                        Spacer()
-                        Text("\(dataManager.groups.count)")
-                            .foregroundColor(.secondary)
-                    }
-                }
+                        VStack(spacing: 0) {
+                            SettingsRow(icon: "📱", title: "Version", value: "1.0.0")
+                            Divider().background(Color.n26Divider)
+                            SettingsRow(icon: "📋", title: "Gruppen", value: "\(dataManager.groups.count)")
+                            Divider().background(Color.n26Divider)
+                            SettingsRow(icon: "💰", title: "Gesamt", value: "\(String(format: "%.2f", dataManager.groups.reduce(0) { $0 + $1.totalExpenses }))€")
+                        }
+                        .background(Color.n26CardBackground)
+                        .cornerRadius(16)
+                        .padding(.horizontal)
 
-                Section(header: Text("Daten")) {
-                    Button("Demo-Daten laden") {
-                        dataManager.createDemoData()
-                    }
+                        // Actions Section
+                        N26SectionHeader("Aktionen", icon: "🎬")
 
-                    Button("Alle Daten löschen", role: .destructive) {
-                        dataManager.groups.removeAll()
-                        dataManager.settlements.removeAll()
-                    }
-                }
+                        VStack(spacing: 0) {
+                            Button(action: { dataManager.createDemoData() }) {
+                                HStack {
+                                    Text("🎲")
+                                        .font(.title2)
+                                    Text("Demo-Daten laden")
+                                        .foregroundColor(.n26TextPrimary)
+                                    Spacer()
+                                }
+                                .padding()
+                            }
 
-                Section(header: Text("Über")) {
-                    Text("SplitWise verwendet einen intelligenten Greedy-Matching-Algorithmus, um die Anzahl der Ausgleichszahlungen zu minimieren.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                            Divider().background(Color.n26Divider)
+
+                            Button(action: {
+                                dataManager.groups.removeAll()
+                                dataManager.settlements.removeAll()
+                            }) {
+                                HStack {
+                                    Text("🗑️")
+                                        .font(.title2)
+                                    Text("Alle Daten löschen")
+                                        .foregroundColor(.n26Error)
+                                    Spacer()
+                                }
+                                .padding()
+                            }
+                        }
+                        .background(Color.n26CardBackground)
+                        .cornerRadius(16)
+                        .padding(.horizontal)
+
+                        // About Section
+                        N26SectionHeader("Über", icon: "💡")
+
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("🧮 Intelligenter Algorithmus")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.n26Teal)
+
+                            Text("SplitWise verwendet den Greedy-Matching-Algorithmus, um die Anzahl der Ausgleichszahlungen zu minimieren. So sparst du Zeit und Überweisungsgebühren! 🍺")
+                                .font(.caption)
+                                .foregroundColor(.n26TextSecondary)
+                        }
+                        .padding()
+                        .background(Color.n26CardBackground)
+                        .cornerRadius(16)
+                        .padding(.horizontal)
+
+                        Spacer(minLength: 100)
+                    }
                 }
             }
-            .navigationTitle("Einstellungen")
-            .alert("Premium freischalten", isPresented: $showingPremiumAlert) {
+            .navigationTitle("⚙️ Settings")
+            .navigationBarTitleDisplayMode(.large)
+            .toolbarBackground(Color.n26Background, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .alert("⭐ Premium freischalten", isPresented: $showingPremiumAlert) {
                 Button("Später") { }
                 Button("Aktivieren") {
                     dataManager.activatePremium()
                 }
             } message: {
-                Text("Mit Premium kannst du Berichte als PDF und CSV exportieren.")
+                Text("Mit Premium kannst du Berichte als PDF und CSV exportieren. 📄")
             }
         }
+        .navigationViewStyle(.stack)
+    }
+}
+
+struct SettingsRow: View {
+    let icon: String
+    let title: String
+    let value: String
+
+    var body: some View {
+        HStack {
+            Text(icon)
+                .font(.title3)
+            Text(title)
+                .foregroundColor(.n26TextPrimary)
+            Spacer()
+            Text(value)
+                .foregroundColor(.n26TextSecondary)
+        }
+        .padding()
     }
 }
 

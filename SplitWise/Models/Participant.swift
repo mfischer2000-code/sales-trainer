@@ -1,21 +1,34 @@
 import Foundation
 
-/// Repräsentiert einen Teilnehmer in einer Gruppe
+/// Repräsentiert einen Teilnehmer in einer Gruppe 👤
 struct Participant: Identifiable, Codable, Hashable {
     let id: UUID
     var name: String
     var avatarEmoji: String
+    var imageData: Data?  // Foto des Teilnehmers (optional)
     var isActive: Bool
 
-    init(id: UUID = UUID(), name: String, avatarEmoji: String = "👤", isActive: Bool = true) {
+    init(
+        id: UUID = UUID(),
+        name: String,
+        avatarEmoji: String = "👤",
+        imageData: Data? = nil,
+        isActive: Bool = true
+    ) {
         self.id = id
         self.name = name
         self.avatarEmoji = avatarEmoji
+        self.imageData = imageData
         self.isActive = isActive
+    }
+
+    /// Prüft ob ein Foto vorhanden ist
+    var hasPhoto: Bool {
+        imageData != nil
     }
 }
 
-/// Gewichtung eines Teilnehmers bei einer Ausgabe
+/// Gewichtung eines Teilnehmers bei einer Ausgabe ⚖️
 struct ParticipantShare: Identifiable, Codable, Hashable {
     let id: UUID
     let participantId: UUID

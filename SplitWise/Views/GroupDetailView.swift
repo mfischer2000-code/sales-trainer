@@ -1,57 +1,70 @@
 import SwiftUI
 
-/// Detailansicht einer Gruppe mit Ausgaben, Salden und Settlements
+/// Detailansicht einer Gruppe mit Ausgaben, Salden und Settlements 🍺
 struct GroupDetailView: View {
     @EnvironmentObject var dataManager: DataManager
     @State var group: Group
     @State private var selectedSegment = 0
     @State private var showingAddExpense = false
-    @State private var showingAddParticipant = false
     @State private var showingExportSheet = false
 
-    private let segments = ["Ausgaben", "Salden", "Statistik"]
+    private let segments = ["💳 Ausgaben", "⚖️ Salden", "📊 Stats"]
 
     var currentGroup: Group {
         dataManager.groups.first { $0.id == group.id } ?? group
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Segment Picker
-            Picker("Ansicht", selection: $selectedSegment) {
-                ForEach(0..<segments.count, id: \.self) { index in
-                    Text(segments[index]).tag(index)
+        ZStack {
+            BeerPatternBackground()
+
+            VStack(spacing: 0) {
+                // Custom Segment Picker
+                HStack(spacing: 8) {
+                    ForEach(0..<segments.count, id: \.self) { index in
+                        Button(action: { withAnimation { selectedSegment = index } }) {
+                            Text(segments[index])
+                                .font(.subheadline)
+                                .fontWeight(selectedSegment == index ? .semibold : .regular)
+                                .foregroundColor(selectedSegment == index ? .black : .n26TextSecondary)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 10)
+                                .background(selectedSegment == index ? Color.n26Teal : Color.n26CardBackground)
+                                .cornerRadius(20)
+                        }
+                    }
+                }
+                .padding()
+
+                // Content
+                switch selectedSegment {
+                case 0:
+                    ExpensesListView(group: currentGroup)
+                case 1:
+                    BalancesView(group: currentGroup)
+                case 2:
+                    StatisticsView(group: currentGroup)
+                default:
+                    EmptyView()
                 }
             }
-            .pickerStyle(.segmented)
-            .padding()
-
-            // Content
-            switch selectedSegment {
-            case 0:
-                ExpensesListView(group: currentGroup)
-            case 1:
-                BalancesView(group: currentGroup)
-            case 2:
-                StatisticsView(group: currentGroup)
-            default:
-                EmptyView()
-            }
         }
-        .navigationTitle(currentGroup.name)
+        .navigationTitle("\(currentGroup.type.icon) \(currentGroup.name)")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(Color.n26Background, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
-                // Export Button (Premium)
                 if dataManager.isPremiumUser {
                     Button(action: { showingExportSheet = true }) {
                         Image(systemName: "square.and.arrow.up")
+                            .foregroundColor(.n26Teal)
                     }
                 }
 
-                // Add Expense Button
                 Button(action: { showingAddExpense = true }) {
                     Image(systemName: "plus.circle.fill")
+                        .foregroundColor(.n26Teal)
                 }
             }
         }
@@ -62,15 +75,15 @@ struct GroupDetailView: View {
             ExportView(group: currentGroup)
         }
         .onAppear {
-            // Sync with DataManager
             if let updatedGroup = dataManager.groups.first(where: { $0.id == group.id }) {
                 group = updatedGroup
             }
         }
+        .preferredColorScheme(.dark)
     }
 }
 
-// MARK: - Expenses List View
+// MARK: - Expenses List View 💳
 
 struct ExpensesListView: View {
     let group: Group
@@ -81,49 +94,46 @@ struct ExpensesListView: View {
     }
 
     var body: some View {
-        List {
+        ScrollView {
             if sortedExpenses.isEmpty {
-                VStack(spacing: 16) {
-                    Image(systemName: "creditcard.fill")
-                        .font(.system(size: 50))
-                        .foregroundColor(.blue.opacity(0.3))
-
+                VStack(spacing: 20) {
+                    Text("💳")
+                        .font(.system(size: 60))
                     Text("Noch keine Ausgaben")
                         .font(.headline)
-
+                        .foregroundColor(.n26TextSecondary)
                     Text("Tippe auf + um eine Ausgabe hinzuzufügen")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.n26TextMuted)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 60)
+                .padding(.top, 60)
             } else {
-                ForEach(sortedExpenses) { expense in
-                    ExpenseRowView(expense: expense, group: group, showGroupName: false)
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            Button(role: .destructive) {
-                                dataManager.deleteExpense(expense.id, from: group.id)
-                            } label: {
-                                Label("Löschen", systemImage: "trash")
+                LazyVStack(spacing: 12) {
+                    ForEach(sortedExpenses) { expense in
+                        ExpenseRowView(expense: expense, group: group, showGroupName: false)
+                            .contextMenu {
+                                Button(action: {
+                                    dataManager.markExpenseAsSettled(expense.id, in: group.id, settled: !expense.isSettled)
+                                }) {
+                                    Label(expense.isSettled ? "Als offen markieren" : "Als erledigt markieren",
+                                          systemImage: expense.isSettled ? "arrow.uturn.backward" : "checkmark")
+                                }
+
+                                Button(role: .destructive, action: {
+                                    dataManager.deleteExpense(expense.id, from: group.id)
+                                }) {
+                                    Label("Löschen", systemImage: "trash")
+                                }
                             }
-                        }
-                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                            Button {
-                                dataManager.markExpenseAsSettled(expense.id, in: group.id, settled: !expense.isSettled)
-                            } label: {
-                                Label(expense.isSettled ? "Öffnen" : "Erledigt",
-                                      systemImage: expense.isSettled ? "arrow.uturn.backward" : "checkmark")
-                            }
-                            .tint(expense.isSettled ? .orange : .green)
-                        }
+                    }
                 }
+                .padding()
             }
         }
-        .listStyle(.insetGrouped)
     }
 }
 
-// MARK: - Expense Row View
+// MARK: - Expense Row View 💰
 
 struct ExpenseRowView: View {
     let expense: Expense
@@ -135,69 +145,75 @@ struct ExpenseRowView: View {
     }
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 14) {
             // Category Icon
             Text(expense.category.icon)
                 .font(.title)
-                .frame(width: 44, height: 44)
-                .background(expense.isSettled ? Color.green.opacity(0.1) : Color.blue.opacity(0.1))
-                .cornerRadius(10)
+                .frame(width: 50, height: 50)
+                .background(expense.isSettled ? Color.n26Success.opacity(0.15) : Color.n26Teal.opacity(0.15))
+                .cornerRadius(12)
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 6) {
                 HStack {
                     Text(expense.title)
                         .font(.headline)
+                        .foregroundColor(.n26TextPrimary)
                         .strikethrough(expense.isSettled)
 
                     if expense.isSettled {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
+                        Text("✅")
                             .font(.caption)
                     }
                 }
 
                 HStack(spacing: 8) {
                     if let payer = payer {
-                        Text("\(payer.avatarEmoji) \(payer.name)")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                        HStack(spacing: 4) {
+                            ParticipantAvatarView(payer, size: 20)
+                            Text(payer.name)
+                        }
+                        .font(.caption)
+                        .foregroundColor(.n26TextSecondary)
                     }
 
                     Text("•")
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.n26TextMuted)
 
                     Text(expense.splitType.rawValue)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.n26TextSecondary)
 
                     if showGroupName {
                         Text("•")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.n26TextMuted)
                         Text(group.name)
                             .font(.caption)
-                            .foregroundColor(.blue)
+                            .foregroundColor(.n26Teal)
                     }
                 }
             }
 
             Spacer()
 
-            VStack(alignment: .trailing) {
+            VStack(alignment: .trailing, spacing: 4) {
                 Text("\(String(format: "%.2f", expense.amount))\(group.currency)")
                     .font(.headline)
-                    .foregroundColor(expense.isSettled ? .secondary : .primary)
+                    .fontWeight(.bold)
+                    .foregroundColor(expense.isSettled ? .n26TextSecondary : .n26TextPrimary)
 
                 Text(expense.date, style: .date)
                     .font(.caption2)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.n26TextMuted)
             }
         }
-        .padding(.vertical, 4)
+        .padding()
+        .background(Color.n26CardBackground)
+        .cornerRadius(16)
         .opacity(expense.isSettled ? 0.7 : 1.0)
     }
 }
 
-// MARK: - Balances View
+// MARK: - Balances View ⚖️
 
 struct BalancesView: View {
     let group: Group
@@ -212,62 +228,91 @@ struct BalancesView: View {
     }
 
     var body: some View {
-        List {
-            // Salden-Übersicht
-            Section(header: Text("Individuelle Salden")) {
-                ForEach(group.participants) { participant in
-                    let balance = balances[participant.id] ?? 0
-                    BalanceRowView(participant: participant, balance: balance, currency: group.currency)
-                }
-            }
+        ScrollView {
+            VStack(spacing: 16) {
+                // Salden-Übersicht
+                N26SectionHeader("Individuelle Salden", icon: "👥")
 
-            // Ausgleichszahlungen
-            Section(header: HStack {
-                Text("Ausgleichszahlungen")
-                Spacer()
-                if settlementResult.savedTransactions > 0 {
-                    Text("\(settlementResult.savedTransactions) eingespart")
-                        .font(.caption)
-                        .foregroundColor(.green)
-                }
-            }) {
-                if settlementResult.settlements.isEmpty {
-                    HStack {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                        Text("Alle Salden sind ausgeglichen!")
+                VStack(spacing: 0) {
+                    ForEach(Array(group.participants.enumerated()), id: \.element.id) { index, participant in
+                        if index > 0 {
+                            Divider().background(Color.n26Divider)
+                        }
+                        let balance = balances[participant.id] ?? 0
+                        BalanceRowView(participant: participant, balance: balance, currency: group.currency)
                     }
-                    .padding(.vertical, 8)
-                } else {
-                    ForEach(settlementResult.settlements) { settlement in
-                        SettlementRowView(
-                            settlement: settlement,
-                            group: group,
-                            onToggleComplete: {
-                                dataManager.markSettlementAsCompleted(
-                                    settlement.id,
-                                    in: group.id,
-                                    completed: !settlement.isCompleted
-                                )
+                }
+                .background(Color.n26CardBackground)
+                .cornerRadius(16)
+                .padding(.horizontal)
+
+                // Ausgleichszahlungen
+                HStack {
+                    N26SectionHeader("Ausgleichszahlungen", icon: "💸")
+                    Spacer()
+                    if settlementResult.savedTransactions > 0 {
+                        Text("✨ \(settlementResult.savedTransactions) eingespart")
+                            .font(.caption)
+                            .foregroundColor(.n26Success)
+                            .padding(.trailing)
+                    }
+                }
+
+                VStack(spacing: 0) {
+                    if settlementResult.settlements.isEmpty {
+                        HStack {
+                            Text("✅")
+                                .font(.title)
+                            Text("Alle Salden sind ausgeglichen!")
+                                .foregroundColor(.n26Success)
+                        }
+                        .padding()
+                    } else {
+                        ForEach(Array(settlementResult.settlements.enumerated()), id: \.element.id) { index, settlement in
+                            if index > 0 {
+                                Divider().background(Color.n26Divider)
                             }
-                        )
+                            SettlementRowView(
+                                settlement: settlement,
+                                group: group,
+                                onToggleComplete: {
+                                    dataManager.markSettlementAsCompleted(
+                                        settlement.id,
+                                        in: group.id,
+                                        completed: !settlement.isCompleted
+                                    )
+                                }
+                            )
+                        }
                     }
                 }
-            }
+                .background(Color.n26CardBackground)
+                .cornerRadius(16)
+                .padding(.horizontal)
 
-            // Info
-            Section {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("So funktioniert's")
-                        .font(.headline)
+                // Info
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Text("🧮")
+                            .font(.title2)
+                        Text("So funktioniert's")
+                            .font(.headline)
+                            .foregroundColor(.n26Teal)
+                    }
 
-                    Text("Der Greedy-Algorithmus minimiert die Anzahl der Überweisungen, indem er die größten Gläubiger mit den größten Schuldnern koppelt.")
+                    Text("Der Greedy-Algorithmus minimiert die Anzahl der Überweisungen, indem er die größten Gläubiger mit den größten Schuldnern koppelt. Prost! 🍺")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.n26TextSecondary)
                 }
+                .padding()
+                .background(Color.n26CardBackground)
+                .cornerRadius(16)
+                .padding(.horizontal)
+
+                Spacer(minLength: 100)
             }
+            .padding(.top)
         }
-        .listStyle(.insetGrouped)
     }
 }
 
@@ -281,25 +326,26 @@ struct BalanceRowView: View {
 
     var body: some View {
         HStack {
-            Text(participant.avatarEmoji)
-                .font(.title2)
+            ParticipantAvatarView(participant, size: 44)
 
             Text(participant.name)
                 .font(.body)
+                .foregroundColor(.n26TextPrimary)
 
             Spacer()
 
-            VStack(alignment: .trailing) {
+            VStack(alignment: .trailing, spacing: 2) {
                 Text("\(isPositive ? "+" : "")\(String(format: "%.2f", balance))\(currency)")
                     .font(.headline)
-                    .foregroundColor(isPositive ? .green : (isNegative ? .red : .secondary))
+                    .fontWeight(.bold)
+                    .foregroundColor(isPositive ? .n26Success : (isNegative ? .n26Error : .n26TextSecondary))
 
-                Text(isPositive ? "bekommt" : (isNegative ? "schuldet" : "ausgeglichen"))
+                Text(isPositive ? "bekommt 💰" : (isNegative ? "schuldet 💸" : "ausgeglichen ✅"))
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.n26TextSecondary)
             }
         }
-        .padding(.vertical, 4)
+        .padding()
     }
 }
 
@@ -321,31 +367,38 @@ struct SettlementRowView: View {
             Button(action: onToggleComplete) {
                 Image(systemName: settlement.isCompleted ? "checkmark.circle.fill" : "circle")
                     .font(.title2)
-                    .foregroundColor(settlement.isCompleted ? .green : .gray)
+                    .foregroundColor(settlement.isCompleted ? .n26Success : .n26TextMuted)
             }
             .buttonStyle(.plain)
 
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 4) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 8) {
                     if let from = fromParticipant {
-                        Text("\(from.avatarEmoji) \(from.name)")
-                            .font(.subheadline)
+                        HStack(spacing: 4) {
+                            ParticipantAvatarView(from, size: 24)
+                            Text(from.name)
+                                .font(.subheadline)
+                                .foregroundColor(.n26TextPrimary)
+                        }
                     }
 
-                    Image(systemName: "arrow.right")
+                    Text("➡️")
                         .font(.caption)
-                        .foregroundColor(.secondary)
 
                     if let to = toParticipant {
-                        Text("\(to.avatarEmoji) \(to.name)")
-                            .font(.subheadline)
+                        HStack(spacing: 4) {
+                            ParticipantAvatarView(to, size: 24)
+                            Text(to.name)
+                                .font(.subheadline)
+                                .foregroundColor(.n26TextPrimary)
+                        }
                     }
                 }
 
                 if settlement.isCompleted, let completedAt = settlement.completedAt {
-                    Text("Erledigt am \(completedAt, style: .date)")
+                    Text("✅ Erledigt am \(completedAt, style: .date)")
                         .font(.caption2)
-                        .foregroundColor(.green)
+                        .foregroundColor(.n26Success)
                 }
             }
 
@@ -353,9 +406,10 @@ struct SettlementRowView: View {
 
             Text("\(String(format: "%.2f", settlement.amount))\(group.currency)")
                 .font(.headline)
-                .foregroundColor(settlement.isCompleted ? .secondary : .primary)
+                .fontWeight(.bold)
+                .foregroundColor(settlement.isCompleted ? .n26TextSecondary : .n26Teal)
         }
-        .padding(.vertical, 4)
+        .padding()
         .opacity(settlement.isCompleted ? 0.7 : 1.0)
     }
 }
