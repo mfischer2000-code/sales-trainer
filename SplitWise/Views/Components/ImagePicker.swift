@@ -38,7 +38,6 @@ struct ImagePicker: UIViewControllerRepresentable {
             provider.loadObject(ofClass: UIImage.self) { image, _ in
                 DispatchQueue.main.async {
                     if let uiImage = image as? UIImage {
-                        // Komprimiere das Bild auf max 200x200 für Speichereffizienz
                         let resized = self.resizeImage(uiImage, targetSize: CGSize(width: 200, height: 200))
                         self.parent.imageData = resized.jpegData(compressionQuality: 0.7)
                     }
@@ -130,88 +129,9 @@ struct PhotoSourcePicker: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Header
-            HStack {
-                Text("📸 Foto auswählen")
-                    .font(.headline)
-                    .foregroundColor(.n26TextPrimary)
-                Spacer()
-                Button(action: { isPresented = false }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(.n26TextSecondary)
-                }
-            }
-            .padding()
-            .background(Color.n26CardBackground)
-
-            Divider()
-                .background(Color.n26Divider)
-
-            // Optionen
-            VStack(spacing: 0) {
-                Button(action: {
-                    showImagePicker = true
-                }) {
-                    HStack {
-                        Image(systemName: "photo.on.rectangle")
-                            .font(.title2)
-                            .foregroundColor(.n26Teal)
-                            .frame(width: 40)
-                        Text("Aus Galerie wählen")
-                            .foregroundColor(.n26TextPrimary)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundColor(.n26TextMuted)
-                    }
-                    .padding()
-                }
-
-                Divider()
-                    .background(Color.n26Divider)
-                    .padding(.leading, 56)
-
-                Button(action: {
-                    showCamera = true
-                }) {
-                    HStack {
-                        Image(systemName: "camera")
-                            .font(.title2)
-                            .foregroundColor(.n26Teal)
-                            .frame(width: 40)
-                        Text("Foto aufnehmen")
-                            .foregroundColor(.n26TextPrimary)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundColor(.n26TextMuted)
-                    }
-                    .padding()
-                }
-
-                if imageData != nil {
-                    Divider()
-                        .background(Color.n26Divider)
-                        .padding(.leading, 56)
-
-                    Button(action: {
-                        imageData = nil
-                        isPresented = false
-                    }) {
-                        HStack {
-                            Image(systemName: "trash")
-                                .font(.title2)
-                                .foregroundColor(.n26Error)
-                                .frame(width: 40)
-                            Text("Foto entfernen")
-                                .foregroundColor(.n26Error)
-                            Spacer()
-                        }
-                        .padding()
-                    }
-                }
-            }
-            .background(Color.n26CardBackground)
-
+            headerSection
+            Divider().background(Color.n26Divider)
+            optionsSection
             Spacer()
         }
         .background(Color.n26Background)
@@ -222,10 +142,72 @@ struct PhotoSourcePicker: View {
             CameraPicker(imageData: $imageData)
                 .ignoresSafeArea()
         }
-        .onChange(of: imageData) { oldValue, newValue in
+        .onChange(of: imageData) { newValue in
             if newValue != nil {
                 isPresented = false
             }
         }
+    }
+
+    private var headerSection: some View {
+        HStack {
+            Text("📸 Foto auswählen")
+                .font(.headline)
+                .foregroundColor(.n26TextPrimary)
+            Spacer()
+            Button(action: { isPresented = false }) {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.title2)
+                    .foregroundColor(.n26TextSecondary)
+            }
+        }
+        .padding()
+        .background(Color.n26CardBackground)
+    }
+
+    private var optionsSection: some View {
+        VStack(spacing: 0) {
+            // Galerie Button
+            Button(action: { showImagePicker = true }) {
+                optionRow(icon: "photo.on.rectangle", text: "Aus Galerie wählen", color: .n26Teal)
+            }
+
+            Divider().background(Color.n26Divider).padding(.leading, 56)
+
+            // Kamera Button
+            Button(action: { showCamera = true }) {
+                optionRow(icon: "camera", text: "Foto aufnehmen", color: .n26Teal)
+            }
+
+            // Löschen Button (nur wenn Foto vorhanden)
+            if imageData != nil {
+                Divider().background(Color.n26Divider).padding(.leading, 56)
+
+                Button(action: {
+                    imageData = nil
+                    isPresented = false
+                }) {
+                    optionRow(icon: "trash", text: "Foto entfernen", color: .n26Error)
+                }
+            }
+        }
+        .background(Color.n26CardBackground)
+    }
+
+    private func optionRow(icon: String, text: String, color: Color) -> some View {
+        HStack {
+            Image(systemName: icon)
+                .font(.title2)
+                .foregroundColor(color)
+                .frame(width: 40)
+            Text(text)
+                .foregroundColor(color == .n26Error ? .n26Error : .n26TextPrimary)
+            Spacer()
+            if color != .n26Error {
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.n26TextMuted)
+            }
+        }
+        .padding()
     }
 }
