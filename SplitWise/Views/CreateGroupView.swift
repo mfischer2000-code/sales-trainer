@@ -22,6 +22,48 @@ struct CreateGroupView: View {
         !groupName.isEmpty && participants.count >= 2
     }
 
+    @ViewBuilder
+    private var avatarPreview: some View {
+        if let imageData = selectedImageData,
+           let uiImage = UIImage(data: imageData) {
+            Image(uiImage: uiImage)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 56, height: 56)
+                .clipShape(Circle())
+                .overlay(Circle().stroke(Color.n26Teal, lineWidth: 2))
+        } else {
+            ZStack {
+                Circle()
+                    .fill(Color.n26CardBackgroundLight)
+                    .frame(width: 56, height: 56)
+                Text(selectedEmoji)
+                    .font(.title)
+            }
+            .overlay(Circle().stroke(Color.n26Teal.opacity(0.5), lineWidth: 2))
+        }
+    }
+
+    private var emojiPicker: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(availableEmojis, id: \.self) { emoji in
+                    Button(action: {
+                        selectedEmoji = emoji
+                        selectedImageData = nil
+                    }) {
+                        let isSelected = selectedEmoji == emoji && selectedImageData == nil
+                        Text(emoji)
+                            .font(.title3)
+                            .padding(6)
+                            .background(isSelected ? Color.n26Teal.opacity(0.3) : Color.clear)
+                            .cornerRadius(8)
+                    }
+                }
+            }
+        }
+    }
+
     var body: some View {
         NavigationView {
             ZStack {
@@ -103,30 +145,7 @@ struct CreateGroupView: View {
                             HStack(spacing: 12) {
                                 // Avatar/Photo Button
                                 Button(action: { showingPhotoPicker = true }) {
-                                    if let imageData = selectedImageData,
-                                       let uiImage = UIImage(data: imageData) {
-                                        Image(uiImage: uiImage)
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(width: 56, height: 56)
-                                            .clipShape(Circle())
-                                            .overlay(
-                                                Circle()
-                                                    .stroke(Color.n26Teal, lineWidth: 2)
-                                            )
-                                    } else {
-                                        ZStack {
-                                            Circle()
-                                                .fill(Color.n26CardBackgroundLight)
-                                                .frame(width: 56, height: 56)
-                                            Text(selectedEmoji)
-                                                .font(.title)
-                                        }
-                                        .overlay(
-                                            Circle()
-                                                .stroke(Color.n26Teal.opacity(0.5), lineWidth: 2)
-                                        )
-                                    }
+                                    avatarPreview
                                 }
 
                                 VStack(alignment: .leading, spacing: 8) {
@@ -138,22 +157,7 @@ struct CreateGroupView: View {
                                         .cornerRadius(10)
 
                                     // Emoji Auswahl
-                                    ScrollView(.horizontal, showsIndicators: false) {
-                                        HStack(spacing: 8) {
-                                            ForEach(availableEmojis, id: \.self) { emoji in
-                                                Button(action: {
-                                                    selectedEmoji = emoji
-                                                    selectedImageData = nil
-                                                }) {
-                                                    Text(emoji)
-                                                        .font(.title3)
-                                                        .padding(6)
-                                                        .background(selectedEmoji == emoji && selectedImageData == nil ? Color.n26Teal.opacity(0.3) : Color.clear)
-                                                        .cornerRadius(8)
-                                                }
-                                            }
-                                        }
-                                    }
+                                    emojiPicker
                                 }
 
                                 Button(action: addParticipant) {

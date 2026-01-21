@@ -222,8 +222,8 @@ struct PhotoSourcePicker: View {
             CameraPicker(imageData: $imageData)
                 .ignoresSafeArea()
         }
-        .onChange(of: imageData) { _, _ in
-            if imageData != nil {
+        .onChange(of: imageData) { oldValue, newValue in
+            if newValue != nil {
                 isPresented = false
             }
         }
