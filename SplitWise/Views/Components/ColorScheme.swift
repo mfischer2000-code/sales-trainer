@@ -155,7 +155,7 @@ struct ParticipantAvatarView: View {
     let participant: Participant
     let size: CGFloat
 
-    init(_ participant: Participant, size: CGFloat = 44) {
+    init(participant: Participant, size: CGFloat = 44) {
         self.participant = participant
         self.size = size
     }

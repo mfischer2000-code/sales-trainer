@@ -169,7 +169,7 @@ struct ExpenseRowView: View {
                 HStack(spacing: 8) {
                     if let payer = payer {
                         HStack(spacing: 4) {
-                            ParticipantAvatarView(payer, size: 20)
+                            ParticipantAvatarView(participant: payer, size: 20)
                             Text(payer.name)
                         }
                         .font(.caption)
@@ -326,7 +326,7 @@ struct BalanceRowView: View {
 
     var body: some View {
         HStack {
-            ParticipantAvatarView(participant, size: 44)
+            ParticipantAvatarView(participant: participant, size: 44)
 
             Text(participant.name)
                 .font(.body)
@@ -375,7 +375,7 @@ struct SettlementRowView: View {
                 HStack(spacing: 8) {
                     if let from = fromParticipant {
                         HStack(spacing: 4) {
-                            ParticipantAvatarView(from, size: 24)
+                            ParticipantAvatarView(participant: from, size: 24)
                             Text(from.name)
                                 .font(.subheadline)
                                 .foregroundColor(.n26TextPrimary)
@@ -387,7 +387,7 @@ struct SettlementRowView: View {
 
                     if let to = toParticipant {
                         HStack(spacing: 4) {
-                            ParticipantAvatarView(to, size: 24)
+                            ParticipantAvatarView(participant: to, size: 24)
                             Text(to.name)
                                 .font(.subheadline)
                                 .foregroundColor(.n26TextPrimary)

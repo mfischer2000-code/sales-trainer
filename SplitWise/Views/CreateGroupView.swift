@@ -197,7 +197,7 @@ struct CreateGroupView: View {
                                     }
 
                                     HStack {
-                                        ParticipantAvatarView(participant, size: 44)
+                                        ParticipantAvatarView(participant: participant, size: 44)
 
                                         Text(participant.name)
                                             .foregroundColor(.n26TextPrimary)

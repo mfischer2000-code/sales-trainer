@@ -260,7 +260,7 @@ struct PayerBreakdownCard: View {
                     ForEach(sortedPayers, id: \.0.id) { participant, amount in
                         VStack(spacing: 4) {
                             HStack {
-                                ParticipantAvatarView(participant, size: 32)
+                                ParticipantAvatarView(participant: participant, size: 32)
 
                                 Text(participant.name)
                                     .font(.subheadline)

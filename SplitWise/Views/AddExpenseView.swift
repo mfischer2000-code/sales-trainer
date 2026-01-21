@@ -137,7 +137,7 @@ struct AddExpenseView: View {
 
                                 Button(action: { selectedPayerId = participant.id }) {
                                     HStack {
-                                        ParticipantAvatarView(participant, size: 40)
+                                        ParticipantAvatarView(participant: participant, size: 40)
 
                                         Text(participant.name)
                                             .foregroundColor(.n26TextPrimary)
@@ -421,7 +421,7 @@ struct ParticipantShareRowN26: View {
             }
             .buttonStyle(.plain)
 
-            ParticipantAvatarView(participant, size: 36)
+            ParticipantAvatarView(participant: participant, size: 36)
 
             Text(participant.name)
                 .foregroundColor(isSelected ? .n26TextPrimary : .n26TextSecondary)
@@ -526,7 +526,7 @@ struct ExpensePreviewViewN26: View {
                 }
 
                 HStack {
-                    ParticipantAvatarView(participant, size: 32)
+                    ParticipantAvatarView(participant: participant, size: 32)
                     Text(participant.name)
                         .foregroundColor(.n26TextPrimary)
                     Spacer()
