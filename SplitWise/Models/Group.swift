@@ -22,7 +22,7 @@ enum GroupType: String, Codable, CaseIterable {
 }
 
 /// Repräsentiert eine Gruppe mit Teilnehmern und Ausgaben
-struct Group: Identifiable, Codable {
+struct ExpenseGroup: Identifiable, Codable {
     let id: UUID
     var name: String
     var type: GroupType

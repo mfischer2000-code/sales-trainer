@@ -7,7 +7,7 @@ final class DataManager: ObservableObject {
 
     // MARK: - Published Properties
 
-    @Published var groups: [Group] = []
+    @Published var groups: [ExpenseGroup] = []
     @Published var settlements: [UUID: [Settlement]] = [:] // GroupID -> Settlements
     @Published var isPremiumUser: Bool = false
 
@@ -30,8 +30,8 @@ final class DataManager: ObservableObject {
     // MARK: - Group Management
 
     /// Erstellt eine neue Gruppe
-    func createGroup(name: String, type: GroupType, participants: [Participant], currency: String = "€") -> Group {
-        let group = Group(
+    func createGroup(name: String, type: GroupType, participants: [Participant], currency: String = "€") -> ExpenseGroup {
+        let group = ExpenseGroup(
             name: name,
             type: type,
             participants: participants,
@@ -43,7 +43,7 @@ final class DataManager: ObservableObject {
     }
 
     /// Aktualisiert eine bestehende Gruppe
-    func updateGroup(_ group: Group) {
+    func updateGroup(_ group: ExpenseGroup) {
         if let index = groups.firstIndex(where: { $0.id == group.id }) {
             groups[index] = group
             saveData()
@@ -51,14 +51,14 @@ final class DataManager: ObservableObject {
     }
 
     /// Löscht eine Gruppe
-    func deleteGroup(_ group: Group) {
+    func deleteGroup(_ group: ExpenseGroup) {
         groups.removeAll { $0.id == group.id }
         settlements.removeValue(forKey: group.id)
         saveData()
     }
 
     /// Archiviert eine Gruppe
-    func archiveGroup(_ group: Group) {
+    func archiveGroup(_ group: ExpenseGroup) {
         if let index = groups.firstIndex(where: { $0.id == group.id }) {
             groups[index].isArchived = true
             saveData()
@@ -149,12 +149,12 @@ final class DataManager: ObservableObject {
     }
 
     /// Holt das SettlementResult für eine Gruppe
-    func getSettlementResult(for group: Group) -> SettlementResult {
+    func getSettlementResult(for group: ExpenseGroup) -> SettlementResult {
         return SettlementCalculator.calculateSettlements(for: group)
     }
 
     /// Holt die Statistiken für eine Gruppe
-    func getStatistics(for group: Group) -> GroupStatistics {
+    func getStatistics(for group: ExpenseGroup) -> GroupStatistics {
         return SettlementCalculator.calculateStatistics(for: group)
     }
 
@@ -186,7 +186,7 @@ final class DataManager: ObservableObject {
         // Lade Gruppen
         if let groupsData = UserDefaults.standard.data(forKey: groupsKey) {
             do {
-                groups = try JSONDecoder().decode([Group].self, from: groupsData)
+                groups = try JSONDecoder().decode([ExpenseGroup].self, from: groupsData)
             } catch {
                 print("Error loading groups: \(error)")
                 groups = []
@@ -221,7 +221,7 @@ final class DataManager: ObservableObject {
         let charlie = Participant(name: "Charlie", avatarEmoji: "🧑")
         let diana = Participant(name: "Diana", avatarEmoji: "👩‍🦰")
 
-        var tripGroup = Group(
+        var tripGroup = ExpenseGroup(
             name: "Wochenendtrip Berlin",
             type: .trip,
             participants: [alice, bob, charlie, diana],

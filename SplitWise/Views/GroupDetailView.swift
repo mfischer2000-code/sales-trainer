@@ -3,14 +3,14 @@ import SwiftUI
 /// Detailansicht einer Gruppe mit Ausgaben, Salden und Settlements 🍺
 struct GroupDetailView: View {
     @EnvironmentObject var dataManager: DataManager
-    @State var group: Group
+    @State var group: ExpenseGroup
     @State private var selectedSegment = 0
     @State private var showingAddExpense = false
     @State private var showingExportSheet = false
 
     private let segments = ["💳 Ausgaben", "⚖️ Salden", "📊 Stats"]
 
-    var currentGroup: Group {
+    var currentGroup: ExpenseGroup {
         dataManager.groups.first { $0.id == group.id } ?? group
     }
 
@@ -86,7 +86,7 @@ struct GroupDetailView: View {
 // MARK: - Expenses List View 💳
 
 struct ExpensesListView: View {
-    let group: Group
+    let group: ExpenseGroup
     @EnvironmentObject var dataManager: DataManager
 
     var sortedExpenses: [Expense] {
@@ -137,7 +137,7 @@ struct ExpensesListView: View {
 
 struct ExpenseRowView: View {
     let expense: Expense
-    let group: Group
+    let group: ExpenseGroup
     let showGroupName: Bool
 
     var payer: Participant? {
@@ -216,7 +216,7 @@ struct ExpenseRowView: View {
 // MARK: - Balances View ⚖️
 
 struct BalancesView: View {
-    let group: Group
+    let group: ExpenseGroup
     @EnvironmentObject var dataManager: DataManager
 
     var settlementResult: SettlementResult {
@@ -351,7 +351,7 @@ struct BalanceRowView: View {
 
 struct SettlementRowView: View {
     let settlement: Settlement
-    let group: Group
+    let group: ExpenseGroup
     let onToggleComplete: () -> Void
 
     var fromParticipant: Participant? {
@@ -416,7 +416,7 @@ struct SettlementRowView: View {
 
 #Preview {
     NavigationView {
-        GroupDetailView(group: Group(
+        GroupDetailView(group: ExpenseGroup(
             name: "Test Gruppe",
             type: .trip,
             participants: [

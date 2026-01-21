@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Statistik-Ansicht mit Übersicht und Fun Facts 📊
 struct StatisticsView: View {
-    let group: Group
+    let group: ExpenseGroup
     @EnvironmentObject var dataManager: DataManager
 
     var statistics: GroupStatistics {
@@ -360,7 +360,7 @@ struct FunFactsCard: View {
 // MARK: - Algorithm Info Card ⚡
 
 struct AlgorithmInfoCard: View {
-    let group: Group
+    let group: ExpenseGroup
     @EnvironmentObject var dataManager: DataManager
 
     var settlementResult: SettlementResult {
@@ -446,7 +446,7 @@ struct AlgorithmInfoCard: View {
 #Preview {
     ZStack {
         BeerPatternBackground()
-        StatisticsView(group: Group(
+        StatisticsView(group: ExpenseGroup(
             name: "Test Trip",
             type: .trip,
             participants: [

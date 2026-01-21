@@ -2,7 +2,7 @@ import SwiftUI
 
 /// View für den Export von Berichten als PDF/CSV 📤
 struct ExportView: View {
-    let group: Group
+    let group: ExpenseGroup
     @EnvironmentObject var dataManager: DataManager
     @Environment(\.dismiss) var dismiss
 
@@ -250,7 +250,7 @@ struct ShareSheet: UIViewControllerRepresentable {
 }
 
 #Preview {
-    ExportView(group: Group(
+    ExportView(group: ExpenseGroup(
         name: "Berlin Trip",
         type: .trip,
         participants: [

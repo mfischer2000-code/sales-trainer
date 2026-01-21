@@ -8,7 +8,7 @@ final class ExportService {
     // MARK: - CSV Export
 
     /// Exportiert eine Gruppe als CSV-String
-    static func exportToCSV(group: Group, settlements: [Settlement]) -> String {
+    static func exportToCSV(group: ExpenseGroup, settlements: [Settlement]) -> String {
         var csv = ""
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
@@ -89,7 +89,7 @@ final class ExportService {
     // MARK: - PDF Export
 
     /// Erstellt ein PDF-Dokument für eine Gruppe
-    static func exportToPDF(group: Group, settlements: [Settlement], statistics: GroupStatistics) -> Data? {
+    static func exportToPDF(group: ExpenseGroup, settlements: [Settlement], statistics: GroupStatistics) -> Data? {
         let pageWidth: CGFloat = 595.2  // A4
         let pageHeight: CGFloat = 841.8 // A4
         let margin: CGFloat = 50

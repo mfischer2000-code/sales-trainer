@@ -2,7 +2,7 @@ import SwiftUI
 
 /// View zum Hinzufügen einer neuen Ausgabe 💸
 struct AddExpenseView: View {
-    let group: Group
+    let group: ExpenseGroup
     @EnvironmentObject var dataManager: DataManager
     @Environment(\.dismiss) var dismiss
 
@@ -543,7 +543,7 @@ struct ExpensePreviewViewN26: View {
 }
 
 #Preview {
-    AddExpenseView(group: Group(
+    AddExpenseView(group: ExpenseGroup(
         name: "Test",
         type: .trip,
         participants: [

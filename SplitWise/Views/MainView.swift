@@ -36,11 +36,11 @@ struct GroupsListView: View {
     @EnvironmentObject var dataManager: DataManager
     @State private var showingCreateGroup = false
 
-    var activeGroups: [Group] {
+    var activeGroups: [ExpenseGroup] {
         dataManager.groups.filter { !$0.isArchived }
     }
 
-    var archivedGroups: [Group] {
+    var archivedGroups: [ExpenseGroup] {
         dataManager.groups.filter { $0.isArchived }
     }
 
@@ -165,7 +165,7 @@ struct StatCard: View {
 // MARK: - Group Row View 📋
 
 struct GroupRowView: View {
-    let group: Group
+    let group: ExpenseGroup
     @EnvironmentObject var dataManager: DataManager
 
     var settlementResult: SettlementResult {
@@ -269,8 +269,8 @@ struct EmptyGroupsView: View {
 struct AllExpensesView: View {
     @EnvironmentObject var dataManager: DataManager
 
-    var allExpenses: [(expense: Expense, group: Group)] {
-        var result: [(Expense, Group)] = []
+    var allExpenses: [(expense: Expense, group: ExpenseGroup)] {
+        var result: [(Expense, ExpenseGroup)] = []
         for group in dataManager.groups {
             for expense in group.expenses {
                 result.append((expense, group))

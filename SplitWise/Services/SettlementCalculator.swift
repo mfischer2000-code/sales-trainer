@@ -10,7 +10,7 @@ final class SettlementCalculator {
     /// Berechnet die minimalen Ausgleichszahlungen für eine Gruppe
     /// - Parameter group: Die Gruppe mit allen Ausgaben und Teilnehmern
     /// - Returns: SettlementResult mit optimierten Zahlungen und Statistiken
-    static func calculateSettlements(for group: Group) -> SettlementResult {
+    static func calculateSettlements(for group: ExpenseGroup) -> SettlementResult {
         // Schritt 1: Netto-Salden berechnen
         let balances = group.calculateBalances()
 
@@ -108,7 +108,7 @@ final class SettlementCalculator {
     // MARK: - Erweiterte Analyse
 
     /// Berechnet detaillierte Statistiken für eine Gruppe
-    static func calculateStatistics(for group: Group) -> GroupStatistics {
+    static func calculateStatistics(for group: ExpenseGroup) -> GroupStatistics {
         let totalSpent = group.totalExpenses
         let expensesByCategory = Dictionary(grouping: group.expenses) { $0.category }
         let expensesByPayer = Dictionary(grouping: group.expenses) { $0.payerId }
