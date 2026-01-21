@@ -7,48 +7,48 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E51000012B5A00010000001 /* SplitWiseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51000002B5A00010000001 /* SplitWiseApp.swift */; };
-		E51000012B5A00010000002 /* Participant.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51000002B5A00010000002 /* Participant.swift */; };
-		E51000012B5A00010000003 /* Expense.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51000002B5A00010000003 /* Expense.swift */; };
-		E51000012B5A00010000004 /* Group.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51000002B5A00010000004 /* Group.swift */; };
-		E51000012B5A00010000005 /* Settlement.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51000002B5A00010000005 /* Settlement.swift */; };
-		E51000012B5A00010000006 /* SettlementCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51000002B5A00010000006 /* SettlementCalculator.swift */; };
-		E51000012B5A00010000007 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51000002B5A00010000007 /* DataManager.swift */; };
-		E51000012B5A00010000008 /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51000002B5A00010000008 /* ExportService.swift */; };
-		E51000012B5A00010000009 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51000002B5A00010000009 /* MainView.swift */; };
-		E51000012B5A00010000010 /* CreateGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51000002B5A00010000010 /* CreateGroupView.swift */; };
-		E51000012B5A00010000011 /* GroupDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51000002B5A00010000011 /* GroupDetailView.swift */; };
-		E51000012B5A00010000012 /* AddExpenseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51000002B5A00010000012 /* AddExpenseView.swift */; };
-		E51000012B5A00010000013 /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51000002B5A00010000013 /* StatisticsView.swift */; };
-		E51000012B5A00010000014 /* ExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51000002B5A00010000014 /* ExportView.swift */; };
-		E51000012B5A00010000015 /* ColorScheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51000002B5A00010000015 /* ColorScheme.swift */; };
-		E51000012B5A00010000016 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E51000002B5A00010000016 /* Assets.xcassets */; };
-		E51000012B5A00010000017 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E51000002B5A00010000017 /* Preview Assets.xcassets */; };
+		A1B2C3D401000001 /* SplitWiseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000001 /* SplitWiseApp.swift */; };
+		A1B2C3D401000002 /* Participant.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000002 /* Participant.swift */; };
+		A1B2C3D401000003 /* Expense.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000003 /* Expense.swift */; };
+		A1B2C3D401000004 /* Group.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000004 /* Group.swift */; };
+		A1B2C3D401000005 /* Settlement.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000005 /* Settlement.swift */; };
+		A1B2C3D401000006 /* SettlementCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000006 /* SettlementCalculator.swift */; };
+		A1B2C3D401000007 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000007 /* DataManager.swift */; };
+		A1B2C3D401000008 /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000008 /* ExportService.swift */; };
+		A1B2C3D401000009 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000009 /* MainView.swift */; };
+		A1B2C3D401000010 /* CreateGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000010 /* CreateGroupView.swift */; };
+		A1B2C3D401000011 /* GroupDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000011 /* GroupDetailView.swift */; };
+		A1B2C3D401000012 /* AddExpenseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000012 /* AddExpenseView.swift */; };
+		A1B2C3D401000013 /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000013 /* StatisticsView.swift */; };
+		A1B2C3D401000014 /* ExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000014 /* ExportView.swift */; };
+		A1B2C3D401000015 /* ColorScheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000015 /* ColorScheme.swift */; };
+		A1B2C3D401000016 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000016 /* Assets.xcassets */; };
+		A1B2C3D401000017 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000017 /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		E50000002B5A00010000000 /* SplitWise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SplitWise.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		E51000002B5A00010000001 /* SplitWiseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitWiseApp.swift; sourceTree = "<group>"; };
-		E51000002B5A00010000002 /* Participant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Participant.swift; sourceTree = "<group>"; };
-		E51000002B5A00010000003 /* Expense.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Expense.swift; sourceTree = "<group>"; };
-		E51000002B5A00010000004 /* Group.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Group.swift; sourceTree = "<group>"; };
-		E51000002B5A00010000005 /* Settlement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settlement.swift; sourceTree = "<group>"; };
-		E51000002B5A00010000006 /* SettlementCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementCalculator.swift; sourceTree = "<group>"; };
-		E51000002B5A00010000007 /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
-		E51000002B5A00010000008 /* ExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportService.swift; sourceTree = "<group>"; };
-		E51000002B5A00010000009 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
-		E51000002B5A00010000010 /* CreateGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateGroupView.swift; sourceTree = "<group>"; };
-		E51000002B5A00010000011 /* GroupDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupDetailView.swift; sourceTree = "<group>"; };
-		E51000002B5A00010000012 /* AddExpenseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddExpenseView.swift; sourceTree = "<group>"; };
-		E51000002B5A00010000013 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
-		E51000002B5A00010000014 /* ExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportView.swift; sourceTree = "<group>"; };
-		E51000002B5A00010000015 /* ColorScheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorScheme.swift; sourceTree = "<group>"; };
-		E51000002B5A00010000016 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		E51000002B5A00010000017 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		A1B2C3D4F0000001 /* SplitWise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SplitWise.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1B2C3D400000001 /* SplitWiseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitWiseApp.swift; sourceTree = "<group>"; };
+		A1B2C3D400000002 /* Participant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Participant.swift; sourceTree = "<group>"; };
+		A1B2C3D400000003 /* Expense.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Expense.swift; sourceTree = "<group>"; };
+		A1B2C3D400000004 /* Group.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Group.swift; sourceTree = "<group>"; };
+		A1B2C3D400000005 /* Settlement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settlement.swift; sourceTree = "<group>"; };
+		A1B2C3D400000006 /* SettlementCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettlementCalculator.swift; sourceTree = "<group>"; };
+		A1B2C3D400000007 /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
+		A1B2C3D400000008 /* ExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportService.swift; sourceTree = "<group>"; };
+		A1B2C3D400000009 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		A1B2C3D400000010 /* CreateGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateGroupView.swift; sourceTree = "<group>"; };
+		A1B2C3D400000011 /* GroupDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupDetailView.swift; sourceTree = "<group>"; };
+		A1B2C3D400000012 /* AddExpenseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddExpenseView.swift; sourceTree = "<group>"; };
+		A1B2C3D400000013 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
+		A1B2C3D400000014 /* ExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportView.swift; sourceTree = "<group>"; };
+		A1B2C3D400000015 /* ColorScheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorScheme.swift; sourceTree = "<group>"; };
+		A1B2C3D400000016 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A1B2C3D400000017 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		E50000032B5A00010000000 /* Frameworks */ = {
+		A1B2C3D4B0000001 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -58,98 +58,98 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		E50000002B5A00000000000 = {
+		A1B2C3D4G0000001 = {
 			isa = PBXGroup;
 			children = (
-				E50000012B5A00010000000 /* SplitWise */,
-				E50000022B5A00010000000 /* Products */,
+				A1B2C3D4G0000002 /* SplitWise */,
+				A1B2C3D4G0000003 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		E50000012B5A00010000000 /* SplitWise */ = {
+		A1B2C3D4G0000002 /* SplitWise */ = {
 			isa = PBXGroup;
 			children = (
-				E50000052B5A00010000000 /* App */,
-				E50000062B5A00010000000 /* Models */,
-				E50000072B5A00010000000 /* Services */,
-				E50000082B5A00010000000 /* Views */,
-				E50000092B5A00010000000 /* Resources */,
-				E500000A2B5A00010000000 /* Preview Content */,
+				A1B2C3D4G0000004 /* App */,
+				A1B2C3D4G0000005 /* Models */,
+				A1B2C3D4G0000006 /* Services */,
+				A1B2C3D4G0000007 /* Views */,
+				A1B2C3D4G0000008 /* Resources */,
+				A1B2C3D4G0000009 /* Preview Content */,
 			);
 			path = SplitWise;
 			sourceTree = "<group>";
 		};
-		E50000022B5A00010000000 /* Products */ = {
+		A1B2C3D4G0000003 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E50000002B5A00010000000 /* SplitWise.app */,
+				A1B2C3D4F0000001 /* SplitWise.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		E50000052B5A00010000000 /* App */ = {
+		A1B2C3D4G0000004 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				E51000002B5A00010000001 /* SplitWiseApp.swift */,
+				A1B2C3D400000001 /* SplitWiseApp.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
 		};
-		E50000062B5A00010000000 /* Models */ = {
+		A1B2C3D4G0000005 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				E51000002B5A00010000002 /* Participant.swift */,
-				E51000002B5A00010000003 /* Expense.swift */,
-				E51000002B5A00010000004 /* Group.swift */,
-				E51000002B5A00010000005 /* Settlement.swift */,
+				A1B2C3D400000002 /* Participant.swift */,
+				A1B2C3D400000003 /* Expense.swift */,
+				A1B2C3D400000004 /* Group.swift */,
+				A1B2C3D400000005 /* Settlement.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
 		};
-		E50000072B5A00010000000 /* Services */ = {
+		A1B2C3D4G0000006 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				E51000002B5A00010000006 /* SettlementCalculator.swift */,
-				E51000002B5A00010000007 /* DataManager.swift */,
-				E51000002B5A00010000008 /* ExportService.swift */,
+				A1B2C3D400000006 /* SettlementCalculator.swift */,
+				A1B2C3D400000007 /* DataManager.swift */,
+				A1B2C3D400000008 /* ExportService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
 		};
-		E50000082B5A00010000000 /* Views */ = {
+		A1B2C3D4G0000007 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				E51000002B5A00010000009 /* MainView.swift */,
-				E51000002B5A00010000010 /* CreateGroupView.swift */,
-				E51000002B5A00010000011 /* GroupDetailView.swift */,
-				E51000002B5A00010000012 /* AddExpenseView.swift */,
-				E51000002B5A00010000013 /* StatisticsView.swift */,
-				E51000002B5A00010000014 /* ExportView.swift */,
-				E500000B2B5A00010000000 /* Components */,
+				A1B2C3D400000009 /* MainView.swift */,
+				A1B2C3D400000010 /* CreateGroupView.swift */,
+				A1B2C3D400000011 /* GroupDetailView.swift */,
+				A1B2C3D400000012 /* AddExpenseView.swift */,
+				A1B2C3D400000013 /* StatisticsView.swift */,
+				A1B2C3D400000014 /* ExportView.swift */,
+				A1B2C3D4G0000010 /* Components */,
 			);
 			path = Views;
 			sourceTree = "<group>";
 		};
-		E50000092B5A00010000000 /* Resources */ = {
+		A1B2C3D4G0000008 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				E51000002B5A00010000016 /* Assets.xcassets */,
+				A1B2C3D400000016 /* Assets.xcassets */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		E500000A2B5A00010000000 /* Preview Content */ = {
+		A1B2C3D4G0000009 /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
-				E51000002B5A00010000017 /* Preview Assets.xcassets */,
+				A1B2C3D400000017 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
-		E500000B2B5A00010000000 /* Components */ = {
+		A1B2C3D4G0000010 /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				E51000002B5A00010000015 /* ColorScheme.swift */,
+				A1B2C3D400000015 /* ColorScheme.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -157,13 +157,13 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		E50000042B5A00010000000 /* SplitWise */ = {
+		A1B2C3D4T0000001 /* SplitWise */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E50000062B5A00020000000 /* Build configuration list for PBXNativeTarget "SplitWise" */;
+			buildConfigurationList = A1B2C3D4L0000002 /* Build configuration list for PBXNativeTarget "SplitWise" */;
 			buildPhases = (
-				E50000012B5A00010000000 /* Sources */,
-				E50000032B5A00010000000 /* Frameworks */,
-				E50000042B5A00020000000 /* Resources */,
+				A1B2C3D4S0000001 /* Sources */,
+				A1B2C3D4B0000001 /* Frameworks */,
+				A1B2C3D4R0000001 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -171,25 +171,25 @@
 			);
 			name = SplitWise;
 			productName = SplitWise;
-			productReference = E50000002B5A00010000000 /* SplitWise.app */;
+			productReference = A1B2C3D4F0000001 /* SplitWise.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		E50000012B5A00000000000 /* Project object */ = {
+		A1B2C3D4P0000001 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1500;
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
-					E50000042B5A00010000000 = {
+					A1B2C3D4T0000001 = {
 						CreatedOnToolsVersion = 15.0;
 					};
 				};
 			};
-			buildConfigurationList = E50000032B5A00000000000 /* Build configuration list for PBXProject "SplitWise" */;
+			buildConfigurationList = A1B2C3D4L0000001 /* Build configuration list for PBXProject "SplitWise" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = de;
 			hasScannedForEncodings = 0;
@@ -198,55 +198,55 @@
 				de,
 				Base,
 			);
-			mainGroup = E50000002B5A00000000000;
-			productRefGroup = E50000022B5A00010000000 /* Products */;
+			mainGroup = A1B2C3D4G0000001;
+			productRefGroup = A1B2C3D4G0000003 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				E50000042B5A00010000000 /* SplitWise */,
+				A1B2C3D4T0000001 /* SplitWise */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		E50000042B5A00020000000 /* Resources */ = {
+		A1B2C3D4R0000001 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E51000012B5A00010000016 /* Assets.xcassets in Resources */,
-				E51000012B5A00010000017 /* Preview Assets.xcassets in Resources */,
+				A1B2C3D401000016 /* Assets.xcassets in Resources */,
+				A1B2C3D401000017 /* Preview Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		E50000012B5A00010000000 /* Sources */ = {
+		A1B2C3D4S0000001 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E51000012B5A00010000001 /* SplitWiseApp.swift in Sources */,
-				E51000012B5A00010000002 /* Participant.swift in Sources */,
-				E51000012B5A00010000003 /* Expense.swift in Sources */,
-				E51000012B5A00010000004 /* Group.swift in Sources */,
-				E51000012B5A00010000005 /* Settlement.swift in Sources */,
-				E51000012B5A00010000006 /* SettlementCalculator.swift in Sources */,
-				E51000012B5A00010000007 /* DataManager.swift in Sources */,
-				E51000012B5A00010000008 /* ExportService.swift in Sources */,
-				E51000012B5A00010000009 /* MainView.swift in Sources */,
-				E51000012B5A00010000010 /* CreateGroupView.swift in Sources */,
-				E51000012B5A00010000011 /* GroupDetailView.swift in Sources */,
-				E51000012B5A00010000012 /* AddExpenseView.swift in Sources */,
-				E51000012B5A00010000013 /* StatisticsView.swift in Sources */,
-				E51000012B5A00010000014 /* ExportView.swift in Sources */,
-				E51000012B5A00010000015 /* ColorScheme.swift in Sources */,
+				A1B2C3D401000001 /* SplitWiseApp.swift in Sources */,
+				A1B2C3D401000002 /* Participant.swift in Sources */,
+				A1B2C3D401000003 /* Expense.swift in Sources */,
+				A1B2C3D401000004 /* Group.swift in Sources */,
+				A1B2C3D401000005 /* Settlement.swift in Sources */,
+				A1B2C3D401000006 /* SettlementCalculator.swift in Sources */,
+				A1B2C3D401000007 /* DataManager.swift in Sources */,
+				A1B2C3D401000008 /* ExportService.swift in Sources */,
+				A1B2C3D401000009 /* MainView.swift in Sources */,
+				A1B2C3D401000010 /* CreateGroupView.swift in Sources */,
+				A1B2C3D401000011 /* GroupDetailView.swift in Sources */,
+				A1B2C3D401000012 /* AddExpenseView.swift in Sources */,
+				A1B2C3D401000013 /* StatisticsView.swift in Sources */,
+				A1B2C3D401000014 /* ExportView.swift in Sources */,
+				A1B2C3D401000015 /* ColorScheme.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		E50000042B5A00000000000 /* Debug */ = {
+		A1B2C3D4C0000001 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -309,7 +309,7 @@
 			};
 			name = Debug;
 		};
-		E50000052B5A00000000000 /* Release */ = {
+		A1B2C3D4C0000002 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -365,7 +365,7 @@
 			};
 			name = Release;
 		};
-		E50000072B5A00020000000 /* Debug */ = {
+		A1B2C3D4C0000003 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -394,7 +394,7 @@
 			};
 			name = Debug;
 		};
-		E50000082B5A00020000000 /* Release */ = {
+		A1B2C3D4C0000004 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -426,25 +426,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		E50000032B5A00000000000 /* Build configuration list for PBXProject "SplitWise" */ = {
+		A1B2C3D4L0000001 /* Build configuration list for PBXProject "SplitWise" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				E50000042B5A00000000000 /* Debug */,
-				E50000052B5A00000000000 /* Release */,
+				A1B2C3D4C0000001 /* Debug */,
+				A1B2C3D4C0000002 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E50000062B5A00020000000 /* Build configuration list for PBXNativeTarget "SplitWise" */ = {
+		A1B2C3D4L0000002 /* Build configuration list for PBXNativeTarget "SplitWise" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				E50000072B5A00020000000 /* Debug */,
-				E50000082B5A00020000000 /* Release */,
+				A1B2C3D4C0000003 /* Debug */,
+				A1B2C3D4C0000004 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = E50000012B5A00000000000 /* Project object */;
+	rootObject = A1B2C3D4P0000001 /* Project object */;
 }
