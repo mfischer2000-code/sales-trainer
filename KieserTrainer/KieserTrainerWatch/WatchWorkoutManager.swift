@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import WatchKit
 import WatchConnectivity
 
 class WatchWorkoutManager: NSObject, ObservableObject {
