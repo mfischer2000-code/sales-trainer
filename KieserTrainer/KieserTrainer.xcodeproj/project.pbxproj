@@ -23,6 +23,7 @@
 		014 /* WorkoutStartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114; };
 		015 /* ActiveWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 115; };
 		016 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 116; };
+		019 /* PhoneWatchConnectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117; };
 		017 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 201; };
 		018 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 202; };
 		W001 /* KieserTrainerWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = W101; };
@@ -50,6 +51,7 @@
 		114 /* WorkoutStartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutStartView.swift; sourceTree = "<group>"; };
 		115 /* ActiveWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveWorkoutView.swift; sourceTree = "<group>"; };
 		116 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		117 /* PhoneWatchConnectivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchConnectivity.swift; sourceTree = "<group>"; };
 		201 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		202 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		300 /* KieserTrainer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KieserTrainer.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -95,6 +97,7 @@
 				101 /* KieserTrainerApp.swift */,
 				503 /* Models */,
 				504 /* Views */,
+				506 /* Services */,
 				201 /* Assets.xcassets */,
 				505 /* Preview Content */,
 			);
@@ -145,6 +148,14 @@
 				202 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		506 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				117 /* PhoneWatchConnectivity.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		W501 /* KieserTrainerWatch */ = {
@@ -284,6 +295,7 @@
 				014 /* WorkoutStartView.swift in Sources */,
 				015 /* ActiveWorkoutView.swift in Sources */,
 				016 /* HistoryView.swift in Sources */,
+				019 /* PhoneWatchConnectivity.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

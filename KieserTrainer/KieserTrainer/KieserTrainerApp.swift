@@ -26,9 +26,16 @@ struct KieserTrainerApp: App {
         }
     }()
 
+    @StateObject private var watchConnectivity = PhoneWatchConnectivity.shared
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear {
+                    // ModelContext für Watch-Sync bereitstellen
+                    watchConnectivity.setModelContext(sharedModelContainer.mainContext)
+                    watchConnectivity.syncExercisesWithWatch()
+                }
         }
         .modelContainer(sharedModelContainer)
     }
