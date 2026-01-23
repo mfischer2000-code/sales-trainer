@@ -29,6 +29,24 @@
         .prompt-text { color: #48bb78; } /* Grün für den dynamischen Teil */
         .copy-hint { position: absolute; right: 10px; top: 10px; font-size: 12px; opacity: 0.7; }
 
+        /* macOS App Styling */
+        .drag-region { -webkit-app-region: drag; height: 38px; position: fixed; top: 0; left: 0; right: 0; background: transparent; }
+        .no-drag { -webkit-app-region: no-drag; }
+
+        .copy-btn {
+            position: absolute; right: 10px; top: 10px;
+            background: #48bb78; color: white; border: none;
+            padding: 6px 12px; border-radius: 4px; cursor: pointer;
+            font-size: 12px; font-weight: bold; transition: all 0.2s;
+        }
+        .copy-btn:hover { background: #38a169; transform: scale(1.05); }
+        .copy-btn.copied { background: #2f855a; }
+
+        /* Extra padding für macOS Titelleiste */
+        @media screen {
+            body { padding-top: 50px; }
+        }
+
         .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 12px; background: #bee3f8; color: #2c5282; margin-right: 5px; }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -36,7 +54,10 @@
 </head>
 <body>
 
-    <div class="container">
+    <!-- macOS Drag Region für Fenstertitel -->
+    <div class="drag-region"></div>
+
+    <div class="container no-drag">
         <h1>🚀 AI Sales Context Trainer</h1>
         <p class="subtitle">Lerne, wie du KI-Tools basierend auf Persona und Verkaufsphase richtig steuerst.</p>
 
@@ -80,8 +101,8 @@
             <div class="card" style="background: #f0fff4; border-color: #38a169;">
                 <h3>⌨️ Dein perfekter Prompt für ChatGPT/Claude</h3>
                 <p>Kopiere das in dein KI-Tool, um das beste Ergebnis zu erhalten:</p>
-                <div class="prompt-box">
-                    <span class="copy-hint">Simuliert</span>
+                <div class="prompt-box" id="promptBox">
+                    <button class="copy-btn" onclick="copyPrompt()">📋 Kopieren</button>
                     Du bist ein erfahrener B2B Sales Coach. <br><br>
                     <strong>Kontext:</strong> <span id="promptContext" class="prompt-text">...</span><br>
                     <strong>Aufgabe:</strong> <span id="promptTask" class="prompt-text">...</span><br>
@@ -151,6 +172,36 @@
             // Smooth scroll
             outputDiv.scrollIntoView({behavior: "smooth"});
         }
+
+        // Prompt in die Zwischenablage kopieren
+        function copyPrompt() {
+            const context = document.getElementById('promptContext').innerText;
+            const task = document.getElementById('promptTask').innerText;
+            const tone = document.getElementById('promptTone').innerText;
+
+            const fullPrompt = `Du bist ein erfahrener B2B Sales Coach.
+
+Kontext: ${context}
+Aufgabe: ${task}
+Tonalität: ${tone}`;
+
+            navigator.clipboard.writeText(fullPrompt).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.innerText = '✓ Kopiert!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.innerText = '📋 Kopieren';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // Keyboard Shortcut: CMD+Enter = Generieren
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                generateStrategy();
+            }
+        });
     </script>
 </body>
 </html>
