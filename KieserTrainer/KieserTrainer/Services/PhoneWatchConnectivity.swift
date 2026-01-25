@@ -106,8 +106,8 @@ class PhoneWatchConnectivity: NSObject, ObservableObject {
         guard let session = wcSession else { return }
 
         // Prüfe ob es ausstehende Workout-Ergebnisse im Context gibt
-        if let context = session.receivedApplicationContext,
-           let results = context["workoutResults"] as? [[String: Any]] {
+        let context = session.receivedApplicationContext
+        if let results = context["workoutResults"] as? [[String: Any]] {
             print("Ausstehende Workout-Ergebnisse gefunden: \(results.count)")
             processWorkoutResults(results)
         }
