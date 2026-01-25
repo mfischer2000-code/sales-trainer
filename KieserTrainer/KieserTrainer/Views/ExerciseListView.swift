@@ -76,12 +76,21 @@ struct ExerciseListView: View {
                     }
                 }
             }
+            .onAppear {
+                // Sync mit Watch wenn Übungsliste geöffnet wird
+                PhoneWatchConnectivity.shared.syncExercisesWithWatch()
+            }
         }
     }
 
     private func deleteExercises(from exercises: [Exercise], at offsets: IndexSet) {
         for index in offsets {
             modelContext.delete(exercises[index])
+        }
+
+        // Sync mit Watch nach dem Löschen
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            PhoneWatchConnectivity.shared.syncExercisesWithWatch()
         }
     }
 }

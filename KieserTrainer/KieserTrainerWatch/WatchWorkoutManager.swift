@@ -241,6 +241,14 @@ extension WatchWorkoutManager: WCSessionDelegate {
             print("iPhone nicht erreichbar, nutze existierenden Context")
         }
     }
+
+    // Öffentliche Methode für manuelles Aktualisieren
+    func requestExercisesManually() {
+        // Zuerst aus Context laden
+        loadExercisesFromContext()
+        // Dann versuchen, neue Daten anzufordern
+        requestExercisesFromPhone()
+    }
 }
 
 // MARK: - Watch Exercise Model

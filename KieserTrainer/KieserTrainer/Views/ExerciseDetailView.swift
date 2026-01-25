@@ -134,9 +134,20 @@ struct ExerciseDetailView: View {
         }
         .onChange(of: exercise.name) { _, _ in
             exercise.updatedAt = Date()
+            PhoneWatchConnectivity.shared.syncExercisesWithWatch()
         }
         .onChange(of: exercise.currentWeight) { _, _ in
             exercise.updatedAt = Date()
+            PhoneWatchConnectivity.shared.syncExercisesWithWatch()
+        }
+        .onChange(of: exercise.isActive) { _, _ in
+            PhoneWatchConnectivity.shared.syncExercisesWithWatch()
+        }
+        .onChange(of: exercise.targetDuration) { _, _ in
+            PhoneWatchConnectivity.shared.syncExercisesWithWatch()
+        }
+        .onChange(of: exercise.machine) { _, _ in
+            PhoneWatchConnectivity.shared.syncExercisesWithWatch()
         }
     }
 }

@@ -123,6 +123,12 @@ struct AddExerciseView: View {
         )
 
         modelContext.insert(exercise)
+
+        // Sync mit Watch nach dem Speichern
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            PhoneWatchConnectivity.shared.syncExercisesWithWatch()
+        }
+
         dismiss()
     }
 }

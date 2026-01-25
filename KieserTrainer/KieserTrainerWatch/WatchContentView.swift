@@ -21,6 +21,7 @@ struct WatchContentView: View {
 
 struct WatchStartView: View {
     @EnvironmentObject var workoutManager: WatchWorkoutManager
+    @State private var isRefreshing = false
 
     var body: some View {
         ScrollView {
@@ -33,9 +34,26 @@ struct WatchStartView: View {
                 Text("Kieser")
                     .font(.headline)
 
-                Text("\(workoutManager.exercises.count) Übungen")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                HStack {
+                    Text("\(workoutManager.exercises.count) Übungen")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    Button(action: {
+                        isRefreshing = true
+                        workoutManager.requestExercisesManually()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                            isRefreshing = false
+                        }
+                    }) {
+                        Image(systemName: isRefreshing ? "arrow.clockwise" : "arrow.triangle.2.circlepath")
+                            .font(.caption)
+                            .rotationEffect(isRefreshing ? .degrees(360) : .degrees(0))
+                            .animation(isRefreshing ? .linear(duration: 1).repeatForever(autoreverses: false) : .default, value: isRefreshing)
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.blue)
+                }
 
                 // Start Button
                 Button(action: {
