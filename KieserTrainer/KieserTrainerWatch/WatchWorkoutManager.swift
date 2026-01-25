@@ -170,18 +170,34 @@ class WatchWorkoutManager: NSObject, ObservableObject {
     // MARK: - iPhone Communication
 
     private func sendWorkoutResults() {
-        guard let session = wcSession, session.isReachable else { return }
+        guard let session = wcSession else { return }
 
         let results = exercises.map { exercise -> [String: Any] in
             return [
                 "name": exercise.name,
                 "weight": exercise.weight,
                 "duration": exercise.completedDuration ?? 0,
-                "exhaustion": exercise.reachedExhaustion
+                "exhaustion": exercise.reachedExhaustion,
+                "date": ISO8601DateFormatter().string(from: Date())
             ]
         }
 
-        session.sendMessage(["workoutResults": results], replyHandler: nil)
+        let message = ["workoutResults": results]
+
+        // IMMER per ApplicationContext speichern (persistent)
+        do {
+            try session.updateApplicationContext(message)
+            print("Workout-Ergebnisse in ApplicationContext gespeichert")
+        } catch {
+            print("Fehler beim Speichern der Ergebnisse: \(error.localizedDescription)")
+        }
+
+        // Zusätzlich per Message senden wenn iPhone erreichbar
+        if session.isReachable {
+            session.sendMessage(message, replyHandler: nil) { error in
+                print("Fehler beim Senden der Ergebnisse: \(error.localizedDescription)")
+            }
+        }
     }
 }
 

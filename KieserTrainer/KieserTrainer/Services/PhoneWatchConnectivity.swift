@@ -99,6 +99,19 @@ class PhoneWatchConnectivity: NSObject, ObservableObject {
             print("Fehler beim Laden der Übungen: \(error)")
         }
     }
+
+    // MARK: - Check for Pending Watch Data
+
+    func checkForPendingWatchData() {
+        guard let session = wcSession else { return }
+
+        // Prüfe ob es ausstehende Workout-Ergebnisse im Context gibt
+        if let context = session.receivedApplicationContext,
+           let results = context["workoutResults"] as? [[String: Any]] {
+            print("Ausstehende Workout-Ergebnisse gefunden: \(results.count)")
+            processWorkoutResults(results)
+        }
+    }
 }
 
 // MARK: - WCSessionDelegate
@@ -138,7 +151,12 @@ extension PhoneWatchConnectivity: WCSessionDelegate {
     }
 
     func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
-        // Verarbeite Context von Watch falls nötig
+        // Workout-Ergebnisse von Watch verarbeiten
+        if let results = applicationContext["workoutResults"] as? [[String: Any]] {
+            DispatchQueue.main.async {
+                self.processWorkoutResults(results)
+            }
+        }
     }
 
     private func processWorkoutResults(_ results: [[String: Any]]) {

@@ -27,6 +27,7 @@ struct KieserTrainerApp: App {
     }()
 
     @StateObject private var watchConnectivity = PhoneWatchConnectivity.shared
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
         WindowGroup {
@@ -35,6 +36,13 @@ struct KieserTrainerApp: App {
                     // ModelContext für Watch-Sync bereitstellen
                     watchConnectivity.setModelContext(sharedModelContainer.mainContext)
                     watchConnectivity.syncExercisesWithWatch()
+                }
+                .onChange(of: scenePhase) { _, newPhase in
+                    if newPhase == .active {
+                        // Sync wenn App aktiv wird
+                        watchConnectivity.syncExercisesWithWatch()
+                        watchConnectivity.checkForPendingWatchData()
+                    }
                 }
         }
         .modelContainer(sharedModelContainer)
