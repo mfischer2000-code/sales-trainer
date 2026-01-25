@@ -38,7 +38,6 @@ class WatchWorkoutManager: NSObject, ObservableObject {
     override init() {
         super.init()
         setupWatchConnectivity()
-        loadSampleExercises() // Fallback wenn keine Verbindung
     }
 
     // MARK: - Watch Connectivity
@@ -51,10 +50,32 @@ class WatchWorkoutManager: NSObject, ObservableObject {
         }
     }
 
-    // MARK: - Sample Data (Fallback)
+    // MARK: - Load Exercises
+
+    private func loadExercisesFromContext() {
+        // Prüfe ob bereits Daten vom iPhone vorhanden sind
+        if let context = wcSession?.receivedApplicationContext,
+           let exerciseData = context["exercises"] as? [[String: Any]],
+           !exerciseData.isEmpty {
+            let loadedExercises = exerciseData.compactMap { WatchExercise(from: $0) }
+            if !loadedExercises.isEmpty {
+                DispatchQueue.main.async {
+                    self.exercises = loadedExercises
+                    print("Übungen aus Context geladen: \(loadedExercises.count)")
+                }
+                return
+            }
+        }
+
+        // Fallback: Demo-Übungen falls keine iPhone-Daten vorhanden
+        if exercises.isEmpty {
+            loadSampleExercises()
+        }
+    }
 
     private func loadSampleExercises() {
         // Demo-Übungen falls keine iPhone-Verbindung
+        print("Lade Demo-Übungen als Fallback")
         exercises = [
             WatchExercise(name: "Beinpresse", weight: 80, targetDuration: 90, machineName: "B1", machineSettings: "Sitz: 5 | Lehne: 3"),
             WatchExercise(name: "Brustpresse", weight: 40, targetDuration: 90, machineName: "C1", machineSettings: "Sitz: 4"),
@@ -168,22 +189,57 @@ class WatchWorkoutManager: NSObject, ObservableObject {
 
 extension WatchWorkoutManager: WCSessionDelegate {
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+        print("Watch WCSession aktiviert: \(activationState.rawValue)")
         if activationState == .activated {
+            // Zuerst existierenden Context laden
+            DispatchQueue.main.async {
+                self.loadExercisesFromContext()
+            }
+            // Dann versuchen, neue Daten anzufordern
             requestExercisesFromPhone()
         }
     }
 
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
+        print("Watch hat Message erhalten")
         DispatchQueue.main.async {
             if let exerciseData = message["exercises"] as? [[String: Any]] {
-                self.exercises = exerciseData.compactMap { WatchExercise(from: $0) }
+                let loadedExercises = exerciseData.compactMap { WatchExercise(from: $0) }
+                if !loadedExercises.isEmpty {
+                    self.exercises = loadedExercises
+                    print("Übungen aus Message geladen: \(loadedExercises.count)")
+                }
+            }
+        }
+    }
+
+    func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
+        print("Watch hat ApplicationContext erhalten")
+        DispatchQueue.main.async {
+            if let exerciseData = applicationContext["exercises"] as? [[String: Any]] {
+                let loadedExercises = exerciseData.compactMap { WatchExercise(from: $0) }
+                if !loadedExercises.isEmpty {
+                    self.exercises = loadedExercises
+                    print("Übungen aus ApplicationContext geladen: \(loadedExercises.count)")
+                }
             }
         }
     }
 
     private func requestExercisesFromPhone() {
-        guard let session = wcSession, session.isReachable else { return }
-        session.sendMessage(["request": "exercises"], replyHandler: nil)
+        guard let session = wcSession else {
+            print("Keine WCSession verfügbar")
+            return
+        }
+
+        if session.isReachable {
+            print("iPhone ist erreichbar, fordere Übungen an")
+            session.sendMessage(["request": "exercises"], replyHandler: nil) { error in
+                print("Fehler beim Anfordern: \(error.localizedDescription)")
+            }
+        } else {
+            print("iPhone nicht erreichbar, nutze existierenden Context")
+        }
     }
 }
 

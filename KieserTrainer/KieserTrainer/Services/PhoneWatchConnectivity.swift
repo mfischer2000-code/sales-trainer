@@ -40,7 +40,10 @@ class PhoneWatchConnectivity: NSObject, ObservableObject {
             return
         }
 
-        let exerciseData = exercises.filter { $0.isActive }.map { exercise -> [String: Any] in
+        let activeExercises = exercises.filter { $0.isActive }
+        print("Sende \(activeExercises.count) Übungen zur Watch")
+
+        let exerciseData = activeExercises.map { exercise -> [String: Any] in
             var data: [String: Any] = [
                 "name": exercise.name,
                 "weight": exercise.currentWeight,
@@ -61,17 +64,22 @@ class PhoneWatchConnectivity: NSObject, ObservableObject {
 
         let message = ["exercises": exerciseData]
 
+        // IMMER den ApplicationContext aktualisieren (persistent)
+        do {
+            try session.updateApplicationContext(message)
+            print("ApplicationContext aktualisiert mit \(exerciseData.count) Übungen")
+        } catch {
+            print("Fehler beim Context-Update: \(error.localizedDescription)")
+        }
+
+        // Zusätzlich per Message senden wenn Watch erreichbar
         if session.isReachable {
+            print("Watch ist erreichbar, sende Message")
             session.sendMessage(message, replyHandler: nil) { error in
                 print("Fehler beim Senden: \(error.localizedDescription)")
             }
         } else {
-            // Falls Watch nicht erreichbar, über Application Context senden
-            do {
-                try session.updateApplicationContext(message)
-            } catch {
-                print("Fehler beim Context-Update: \(error.localizedDescription)")
-            }
+            print("Watch nicht erreichbar, nur Context wurde aktualisiert")
         }
     }
 
