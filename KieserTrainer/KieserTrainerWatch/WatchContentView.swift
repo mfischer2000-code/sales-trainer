@@ -25,24 +25,30 @@ struct WatchStartView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
+            VStack(spacing: 12) {
                 // Header
                 Image(systemName: "figure.strengthtraining.traditional")
-                    .font(.system(size: 40))
+                    .font(.system(size: 36))
                     .foregroundStyle(.orange)
 
                 Text("Kieser")
                     .font(.headline)
 
+                // Sync Status
+                Text(workoutManager.syncStatus)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+
                 HStack {
                     Text("\(workoutManager.exercises.count) Übungen")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(workoutManager.exercises.isEmpty ? .red : .secondary)
 
                     Button(action: {
                         isRefreshing = true
                         workoutManager.requestExercisesManually()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                             isRefreshing = false
                         }
                     }) {
@@ -55,35 +61,59 @@ struct WatchStartView: View {
                     .foregroundStyle(.blue)
                 }
 
-                // Start Button
-                Button(action: {
-                    workoutManager.startWorkout()
-                }) {
-                    HStack {
-                        Image(systemName: "play.fill")
-                        Text("Start")
+                // Start Button (nur wenn Übungen vorhanden)
+                if !workoutManager.exercises.isEmpty {
+                    Button(action: {
+                        workoutManager.startWorkout()
+                    }) {
+                        HStack {
+                            Image(systemName: "play.fill")
+                            Text("Start")
+                        }
+                        .frame(maxWidth: .infinity)
                     }
-                    .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(.orange)
+                    .buttonStyle(.borderedProminent)
+                    .tint(.orange)
 
-                // Übungsliste
-                ForEach(workoutManager.exercises.prefix(3)) { exercise in
-                    HStack {
-                        Text(exercise.name)
-                            .font(.caption2)
-                        Spacer()
-                        Text(exercise.formattedWeight)
+                    // Übungsliste
+                    ForEach(workoutManager.exercises.prefix(3)) { exercise in
+                        HStack {
+                            Text(exercise.name)
+                                .font(.caption2)
+                            Spacer()
+                            Text(exercise.formattedWeight)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    if workoutManager.exercises.count > 3 {
+                        Text("+ \(workoutManager.exercises.count - 3) weitere")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
-                }
+                } else {
+                    // Keine Übungen - Hinweis anzeigen
+                    VStack(spacing: 8) {
+                        Text("Keine Übungen")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
 
-                if workoutManager.exercises.count > 3 {
-                    Text("+ \(workoutManager.exercises.count - 3) weitere")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        Text("Öffne die iPhone-App und füge Übungen hinzu")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                            .multilineTextAlignment(.center)
+
+                        Button("Aktualisieren") {
+                            isRefreshing = true
+                            workoutManager.requestExercisesManually()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                isRefreshing = false
+                            }
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(.blue)
+                    }
                 }
             }
             .padding()

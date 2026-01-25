@@ -14,6 +14,7 @@ class PhoneWatchConnectivity: NSObject, ObservableObject {
 
     private var wcSession: WCSession?
     private var modelContext: ModelContext?
+    private var pendingSync = false
 
     override init() {
         super.init()
@@ -21,29 +22,39 @@ class PhoneWatchConnectivity: NSObject, ObservableObject {
     }
 
     func setModelContext(_ context: ModelContext) {
+        print("[iPhone] ModelContext gesetzt")
         self.modelContext = context
+
+        // Falls ein Sync aussteht, jetzt ausführen
+        if pendingSync {
+            pendingSync = false
+            syncExercisesWithWatch()
+        }
     }
 
     private func setupWatchConnectivity() {
         if WCSession.isSupported() {
+            print("[iPhone] WCSession wird eingerichtet")
             wcSession = WCSession.default
             wcSession?.delegate = self
             wcSession?.activate()
+        } else {
+            print("[iPhone] WCSession wird NICHT unterstützt")
         }
     }
 
     // MARK: - Send Exercises to Watch
 
     func sendExercisesToWatch(exercises: [Exercise]) {
-        guard let session = wcSession, session.isPaired, session.isWatchAppInstalled else {
-            print("Watch nicht verbunden oder App nicht installiert")
+        guard let session = wcSession else {
+            print("[iPhone] FEHLER: Keine WCSession")
             return
         }
 
-        let activeExercises = exercises.filter { $0.isActive }
-        print("Sende \(activeExercises.count) Übungen zur Watch")
+        print("[iPhone] Session Status - isPaired: \(session.isPaired), isWatchAppInstalled: \(session.isWatchAppInstalled), isReachable: \(session.isReachable)")
 
-        let exerciseData = activeExercises.map { exercise -> [String: Any] in
+        // Sende auch wenn Watch App "nicht installiert" scheint (kann bei frischer Installation vorkommen)
+        let exerciseData = exercises.map { exercise -> [String: Any] in
             var data: [String: Any] = [
                 "name": exercise.name,
                 "weight": exercise.currentWeight,
@@ -62,41 +73,58 @@ class PhoneWatchConnectivity: NSObject, ObservableObject {
             return data
         }
 
-        let message = ["exercises": exerciseData]
+        print("[iPhone] Bereite \(exerciseData.count) Übungen zum Senden vor")
+
+        let message: [String: Any] = [
+            "exercises": exerciseData,
+            "timestamp": Date().timeIntervalSince1970
+        ]
 
         // IMMER den ApplicationContext aktualisieren (persistent)
         do {
             try session.updateApplicationContext(message)
-            print("ApplicationContext aktualisiert mit \(exerciseData.count) Übungen")
+            print("[iPhone] ✅ ApplicationContext aktualisiert mit \(exerciseData.count) Übungen")
         } catch {
-            print("Fehler beim Context-Update: \(error.localizedDescription)")
+            print("[iPhone] ❌ Fehler beim Context-Update: \(error.localizedDescription)")
         }
 
         // Zusätzlich per Message senden wenn Watch erreichbar
         if session.isReachable {
-            print("Watch ist erreichbar, sende Message")
+            print("[iPhone] Watch ist erreichbar, sende auch per Message")
             session.sendMessage(message, replyHandler: nil) { error in
-                print("Fehler beim Senden: \(error.localizedDescription)")
+                print("[iPhone] ❌ Fehler beim Message-Senden: \(error.localizedDescription)")
             }
-        } else {
-            print("Watch nicht erreichbar, nur Context wurde aktualisiert")
         }
     }
 
     // MARK: - Fetch and Send
 
     func syncExercisesWithWatch() {
-        guard let context = modelContext else { return }
+        print("[iPhone] syncExercisesWithWatch aufgerufen")
+
+        guard let context = modelContext else {
+            print("[iPhone] ⚠️ ModelContext noch nicht gesetzt - Sync wird nachgeholt")
+            pendingSync = true
+            return
+        }
 
         do {
+            // ALLE Übungen laden (nicht nur aktive) - Watch kann filtern
             let descriptor = FetchDescriptor<Exercise>(
-                predicate: #Predicate { $0.isActive },
                 sortBy: [SortDescriptor(\.orderIndex)]
             )
-            let exercises = try context.fetch(descriptor)
-            sendExercisesToWatch(exercises: exercises)
+            let allExercises = try context.fetch(descriptor)
+            let activeExercises = allExercises.filter { $0.isActive }
+
+            print("[iPhone] Gefunden: \(allExercises.count) Übungen total, \(activeExercises.count) aktiv")
+
+            if activeExercises.isEmpty {
+                print("[iPhone] ⚠️ Keine aktiven Übungen zum Senden!")
+            }
+
+            sendExercisesToWatch(exercises: activeExercises)
         } catch {
-            print("Fehler beim Laden der Übungen: \(error)")
+            print("[iPhone] ❌ Fehler beim Laden der Übungen: \(error)")
         }
     }
 
@@ -105,10 +133,9 @@ class PhoneWatchConnectivity: NSObject, ObservableObject {
     func checkForPendingWatchData() {
         guard let session = wcSession else { return }
 
-        // Prüfe ob es ausstehende Workout-Ergebnisse im Context gibt
         let context = session.receivedApplicationContext
         if let results = context["workoutResults"] as? [[String: Any]] {
-            print("Ausstehende Workout-Ergebnisse gefunden: \(results.count)")
+            print("[iPhone] Ausstehende Workout-Ergebnisse gefunden: \(results.count)")
             processWorkoutResults(results)
         }
     }
@@ -118,6 +145,8 @@ class PhoneWatchConnectivity: NSObject, ObservableObject {
 
 extension PhoneWatchConnectivity: WCSessionDelegate {
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+        print("[iPhone] WCSession Aktivierung: \(activationState.rawValue), Error: \(error?.localizedDescription ?? "keine")")
+
         if activationState == .activated {
             DispatchQueue.main.async {
                 self.syncExercisesWithWatch()
@@ -126,17 +155,20 @@ extension PhoneWatchConnectivity: WCSessionDelegate {
     }
 
     func sessionDidBecomeInactive(_ session: WCSession) {
-        // Nicht benötigt für Watch-only
+        print("[iPhone] Session wurde inaktiv")
     }
 
     func sessionDidDeactivate(_ session: WCSession) {
-        // Session erneut aktivieren
+        print("[iPhone] Session wurde deaktiviert, reaktiviere...")
         wcSession?.activate()
     }
 
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
+        print("[iPhone] Message erhalten: \(message.keys)")
+
         // Watch fragt nach Übungen
         if message["request"] as? String == "exercises" {
+            print("[iPhone] Watch fordert Übungen an")
             DispatchQueue.main.async {
                 self.syncExercisesWithWatch()
             }
@@ -151,7 +183,8 @@ extension PhoneWatchConnectivity: WCSessionDelegate {
     }
 
     func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
-        // Workout-Ergebnisse von Watch verarbeiten
+        print("[iPhone] ApplicationContext erhalten: \(applicationContext.keys)")
+
         if let results = applicationContext["workoutResults"] as? [[String: Any]] {
             DispatchQueue.main.async {
                 self.processWorkoutResults(results)
@@ -160,8 +193,7 @@ extension PhoneWatchConnectivity: WCSessionDelegate {
     }
 
     private func processWorkoutResults(_ results: [[String: Any]]) {
-        // Hier könnten Workout-Ergebnisse von der Watch verarbeitet werden
-        // Für jetzt nur loggen
-        print("Workout-Ergebnisse von Watch erhalten: \(results.count) Übungen")
+        print("[iPhone] Workout-Ergebnisse von Watch erhalten: \(results.count) Übungen")
+        // TODO: Ergebnisse in SwiftData speichern
     }
 }

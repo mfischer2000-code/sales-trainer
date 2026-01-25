@@ -14,6 +14,7 @@ class WatchWorkoutManager: NSObject, ObservableObject {
     @Published var exercises: [WatchExercise] = []
     @Published var currentExerciseIndex: Int = 0
     @Published var isWorkoutActive: Bool = false
+    @Published var syncStatus: String = "Initialisiere..."
 
     // Timer State
     @Published var elapsedSeconds: Int = 0
@@ -37,6 +38,7 @@ class WatchWorkoutManager: NSObject, ObservableObject {
 
     override init() {
         super.init()
+        print("[Watch] WatchWorkoutManager init")
         setupWatchConnectivity()
     }
 
@@ -44,45 +46,63 @@ class WatchWorkoutManager: NSObject, ObservableObject {
 
     private func setupWatchConnectivity() {
         if WCSession.isSupported() {
+            print("[Watch] WCSession wird eingerichtet")
             wcSession = WCSession.default
             wcSession?.delegate = self
             wcSession?.activate()
+        } else {
+            print("[Watch] WCSession wird NICHT unterstützt")
+            DispatchQueue.main.async {
+                self.syncStatus = "WCSession nicht unterstützt"
+            }
         }
     }
 
     // MARK: - Load Exercises
 
     private func loadExercisesFromContext() {
-        // Prüfe ob bereits Daten vom iPhone vorhanden sind
-        if let context = wcSession?.receivedApplicationContext,
-           let exerciseData = context["exercises"] as? [[String: Any]],
-           !exerciseData.isEmpty {
+        print("[Watch] loadExercisesFromContext aufgerufen")
+
+        guard let session = wcSession else {
+            print("[Watch] Keine WCSession verfügbar")
+            DispatchQueue.main.async {
+                self.syncStatus = "Keine Verbindung"
+            }
+            return
+        }
+
+        let context = session.receivedApplicationContext
+        print("[Watch] Context Keys: \(context.keys)")
+
+        if let exerciseData = context["exercises"] as? [[String: Any]] {
+            print("[Watch] Gefunden: \(exerciseData.count) Übungen im Context")
+
             let loadedExercises = exerciseData.compactMap { WatchExercise(from: $0) }
+            print("[Watch] Erfolgreich geladen: \(loadedExercises.count) Übungen")
+
             if !loadedExercises.isEmpty {
                 DispatchQueue.main.async {
                     self.exercises = loadedExercises
-                    print("Übungen aus Context geladen: \(loadedExercises.count)")
+                    self.syncStatus = "\(loadedExercises.count) Übungen geladen"
+                    print("[Watch] ✅ Übungen aktualisiert: \(loadedExercises.count)")
                 }
-                return
+            } else {
+                DispatchQueue.main.async {
+                    self.syncStatus = "Keine Übungen im Context"
+                }
+            }
+        } else {
+            print("[Watch] Keine 'exercises' im Context gefunden")
+            DispatchQueue.main.async {
+                self.syncStatus = "Warte auf iPhone..."
             }
         }
 
-        // Fallback: Demo-Übungen falls keine iPhone-Daten vorhanden
-        if exercises.isEmpty {
-            loadSampleExercises()
+        // Timestamp prüfen
+        if let timestamp = context["timestamp"] as? TimeInterval {
+            let date = Date(timeIntervalSince1970: timestamp)
+            print("[Watch] Context Timestamp: \(date)")
         }
-    }
-
-    private func loadSampleExercises() {
-        // Demo-Übungen falls keine iPhone-Verbindung
-        print("Lade Demo-Übungen als Fallback")
-        exercises = [
-            WatchExercise(name: "Beinpresse", weight: 80, targetDuration: 90, machineName: "B1", machineSettings: "Sitz: 5 | Lehne: 3"),
-            WatchExercise(name: "Brustpresse", weight: 40, targetDuration: 90, machineName: "C1", machineSettings: "Sitz: 4"),
-            WatchExercise(name: "Rudern", weight: 50, targetDuration: 90, machineName: "D2", machineSettings: "Brust: 3"),
-            WatchExercise(name: "Schulterdrücken", weight: 25, targetDuration: 90, machineName: "A3", machineSettings: "Sitz: 6"),
-            WatchExercise(name: "Bauchmaschine", weight: 30, targetDuration: 90, machineName: "F1", machineSettings: "")
-        ]
     }
 
     // MARK: - Workout Control
@@ -170,7 +190,10 @@ class WatchWorkoutManager: NSObject, ObservableObject {
     // MARK: - iPhone Communication
 
     private func sendWorkoutResults() {
-        guard let session = wcSession else { return }
+        guard let session = wcSession else {
+            print("[Watch] Keine WCSession für Ergebnisse")
+            return
+        }
 
         let results = exercises.map { exercise -> [String: Any] in
             return [
@@ -187,15 +210,60 @@ class WatchWorkoutManager: NSObject, ObservableObject {
         // IMMER per ApplicationContext speichern (persistent)
         do {
             try session.updateApplicationContext(message)
-            print("Workout-Ergebnisse in ApplicationContext gespeichert")
+            print("[Watch] ✅ Workout-Ergebnisse in ApplicationContext gespeichert")
         } catch {
-            print("Fehler beim Speichern der Ergebnisse: \(error.localizedDescription)")
+            print("[Watch] ❌ Fehler beim Speichern der Ergebnisse: \(error.localizedDescription)")
         }
 
         // Zusätzlich per Message senden wenn iPhone erreichbar
         if session.isReachable {
+            print("[Watch] iPhone erreichbar, sende auch per Message")
             session.sendMessage(message, replyHandler: nil) { error in
-                print("Fehler beim Senden der Ergebnisse: \(error.localizedDescription)")
+                print("[Watch] ❌ Fehler beim Senden der Ergebnisse: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    // Öffentliche Methode für manuelles Aktualisieren
+    func requestExercisesManually() {
+        print("[Watch] Manuelles Update angefordert")
+
+        DispatchQueue.main.async {
+            self.syncStatus = "Aktualisiere..."
+        }
+
+        // Zuerst aus Context laden
+        loadExercisesFromContext()
+
+        // Dann versuchen, neue Daten anzufordern
+        requestExercisesFromPhone()
+    }
+
+    private func requestExercisesFromPhone() {
+        guard let session = wcSession else {
+            print("[Watch] Keine WCSession verfügbar")
+            return
+        }
+
+        print("[Watch] Session Status - isReachable: \(session.isReachable)")
+
+        if session.isReachable {
+            print("[Watch] iPhone ist erreichbar, fordere Übungen an")
+            DispatchQueue.main.async {
+                self.syncStatus = "Frage iPhone..."
+            }
+            session.sendMessage(["request": "exercises"], replyHandler: nil) { error in
+                print("[Watch] ❌ Fehler beim Anfordern: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    self.syncStatus = "Fehler: \(error.localizedDescription)"
+                }
+            }
+        } else {
+            print("[Watch] iPhone nicht erreichbar")
+            DispatchQueue.main.async {
+                if self.exercises.isEmpty {
+                    self.syncStatus = "iPhone nicht erreichbar"
+                }
             }
         }
     }
@@ -205,65 +273,53 @@ class WatchWorkoutManager: NSObject, ObservableObject {
 
 extension WatchWorkoutManager: WCSessionDelegate {
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-        print("Watch WCSession aktiviert: \(activationState.rawValue)")
+        print("[Watch] WCSession Aktivierung: \(activationState.rawValue), Error: \(error?.localizedDescription ?? "keine")")
+
         if activationState == .activated {
-            // Zuerst existierenden Context laden
             DispatchQueue.main.async {
-                self.loadExercisesFromContext()
+                self.syncStatus = "Verbunden"
             }
+            // Zuerst existierenden Context laden
+            loadExercisesFromContext()
             // Dann versuchen, neue Daten anzufordern
             requestExercisesFromPhone()
+        } else {
+            DispatchQueue.main.async {
+                self.syncStatus = "Nicht verbunden"
+            }
         }
     }
 
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
-        print("Watch hat Message erhalten")
+        print("[Watch] Message erhalten: \(message.keys)")
+
         DispatchQueue.main.async {
             if let exerciseData = message["exercises"] as? [[String: Any]] {
+                print("[Watch] \(exerciseData.count) Übungen in Message")
                 let loadedExercises = exerciseData.compactMap { WatchExercise(from: $0) }
                 if !loadedExercises.isEmpty {
                     self.exercises = loadedExercises
-                    print("Übungen aus Message geladen: \(loadedExercises.count)")
+                    self.syncStatus = "✅ \(loadedExercises.count) Übungen"
+                    print("[Watch] ✅ Übungen aus Message geladen: \(loadedExercises.count)")
                 }
             }
         }
     }
 
     func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
-        print("Watch hat ApplicationContext erhalten")
+        print("[Watch] ApplicationContext erhalten: \(applicationContext.keys)")
+
         DispatchQueue.main.async {
             if let exerciseData = applicationContext["exercises"] as? [[String: Any]] {
+                print("[Watch] \(exerciseData.count) Übungen in Context")
                 let loadedExercises = exerciseData.compactMap { WatchExercise(from: $0) }
                 if !loadedExercises.isEmpty {
                     self.exercises = loadedExercises
-                    print("Übungen aus ApplicationContext geladen: \(loadedExercises.count)")
+                    self.syncStatus = "✅ \(loadedExercises.count) Übungen"
+                    print("[Watch] ✅ Übungen aus ApplicationContext geladen: \(loadedExercises.count)")
                 }
             }
         }
-    }
-
-    private func requestExercisesFromPhone() {
-        guard let session = wcSession else {
-            print("Keine WCSession verfügbar")
-            return
-        }
-
-        if session.isReachable {
-            print("iPhone ist erreichbar, fordere Übungen an")
-            session.sendMessage(["request": "exercises"], replyHandler: nil) { error in
-                print("Fehler beim Anfordern: \(error.localizedDescription)")
-            }
-        } else {
-            print("iPhone nicht erreichbar, nutze existierenden Context")
-        }
-    }
-
-    // Öffentliche Methode für manuelles Aktualisieren
-    func requestExercisesManually() {
-        // Zuerst aus Context laden
-        loadExercisesFromContext()
-        // Dann versuchen, neue Daten anzufordern
-        requestExercisesFromPhone()
     }
 }
 
@@ -297,9 +353,30 @@ struct WatchExercise: Identifiable {
     }
 
     init?(from dict: [String: Any]) {
-        guard let name = dict["name"] as? String,
-              let weight = dict["weight"] as? Double,
-              let targetDuration = dict["targetDuration"] as? Int else {
+        guard let name = dict["name"] as? String else {
+            print("[Watch] WatchExercise: Kein 'name' gefunden")
+            return nil
+        }
+
+        // Weight kann Int oder Double sein
+        let weight: Double
+        if let w = dict["weight"] as? Double {
+            weight = w
+        } else if let w = dict["weight"] as? Int {
+            weight = Double(w)
+        } else {
+            print("[Watch] WatchExercise: Kein 'weight' gefunden für \(name)")
+            return nil
+        }
+
+        // targetDuration kann Int oder Double sein
+        let targetDuration: Int
+        if let td = dict["targetDuration"] as? Int {
+            targetDuration = td
+        } else if let td = dict["targetDuration"] as? Double {
+            targetDuration = Int(td)
+        } else {
+            print("[Watch] WatchExercise: Kein 'targetDuration' gefunden für \(name)")
             return nil
         }
 
@@ -308,5 +385,7 @@ struct WatchExercise: Identifiable {
         self.targetDuration = targetDuration
         self.machineName = dict["machineName"] as? String ?? ""
         self.machineSettings = dict["machineSettings"] as? String ?? ""
+
+        print("[Watch] WatchExercise erstellt: \(name), \(weight)kg, \(targetDuration)s")
     }
 }
