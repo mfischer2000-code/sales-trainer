@@ -46,8 +46,8 @@ struct ExerciseDetailView: View {
                         .foregroundStyle(.secondary)
                 }
 
-                Stepper("Steigerung: \(String(format: "%.1f", exercise.weightIncrement)) kg",
-                       value: $exercise.weightIncrement, in: 0.5...10, step: 0.5)
+                Stepper("Steigerung: \(String(format: "%.0f", exercise.weightIncrement)) kg",
+                       value: $exercise.weightIncrement, in: 5...20, step: 5)
 
                 Stepper("Zieldauer: \(exercise.targetDuration) Sek.",
                        value: $exercise.targetDuration, in: 30...180, step: 10)

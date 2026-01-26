@@ -38,7 +38,7 @@ final class Exercise {
         muscleGroup: MuscleGroup = .other,
         notes: String = "",
         currentWeight: Double = 0,
-        weightIncrement: Double = 2.5,
+        weightIncrement: Double = 5.0,  // 5kg Schritte für Kieser
         targetDuration: Int = 90,
         machine: Machine? = nil,
         orderIndex: Int = 0

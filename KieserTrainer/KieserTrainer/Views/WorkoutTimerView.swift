@@ -2,7 +2,7 @@
 //  WorkoutTimerView.swift
 //  KieserTrainer
 //
-//  90-Sekunden Kieser-Timer für maximale Erschöpfung
+//  90-Sekunden Kieser-Timer mit Rhythmus (4s hoch, 2s halten, 4s runter)
 //
 
 import SwiftUI
@@ -35,16 +35,53 @@ struct WorkoutTimerView: View {
         min(Double(elapsedSeconds) / Double(targetDuration), 1.0)
     }
 
-    var remainingSeconds: Int {
-        max(targetDuration - elapsedSeconds, 0)
-    }
-
     var isOvertime: Bool {
         elapsedSeconds > targetDuration
     }
 
-    var overtimeSeconds: Int {
-        max(elapsedSeconds - targetDuration, 0)
+    // MARK: - Kieser Rhythmus (4-2-4 = 10 Sekunden pro Wiederholung)
+
+    var cycleSeconds: Int {
+        elapsedSeconds % 10  // 0-9
+    }
+
+    var currentPhase: KieserPhase {
+        let sec = cycleSeconds
+        if sec < 4 {
+            return .up      // 0-3: 4 Sekunden HOCH
+        } else if sec < 6 {
+            return .hold    // 4-5: 2 Sekunden HALTEN
+        } else {
+            return .down    // 6-9: 4 Sekunden RUNTER
+        }
+    }
+
+    var phaseProgress: Double {
+        let sec = cycleSeconds
+        switch currentPhase {
+        case .up:
+            return Double(sec + 1) / 4.0
+        case .hold:
+            return Double(sec - 3) / 2.0
+        case .down:
+            return Double(sec - 5) / 4.0
+        }
+    }
+
+    var phaseSecondsRemaining: Int {
+        let sec = cycleSeconds
+        switch currentPhase {
+        case .up:
+            return 4 - sec
+        case .hold:
+            return 6 - sec
+        case .down:
+            return 10 - sec
+        }
+    }
+
+    var repetitionCount: Int {
+        (elapsedSeconds / 10) + 1
     }
 
     var body: some View {
@@ -56,14 +93,16 @@ struct WorkoutTimerView: View {
 
             Spacer()
 
+            // Kieser Rhythmus Anzeige
+            if isRunning || elapsedSeconds > 0 {
+                kieserRhythmDisplay
+                    .padding(.bottom, 20)
+            }
+
             // Großer Timer-Ring
             timerDisplay
 
             Spacer()
-
-            // Anweisungen
-            instructionText
-                .padding()
 
             // Control Buttons
             controlButtons
@@ -111,44 +150,127 @@ struct WorkoutTimerView: View {
         }
     }
 
+    private var kieserRhythmDisplay: some View {
+        VStack(spacing: 12) {
+            // Phase-Anzeige
+            HStack(spacing: 20) {
+                PhaseIndicator(phase: .up, isActive: currentPhase == .up)
+                PhaseIndicator(phase: .hold, isActive: currentPhase == .hold)
+                PhaseIndicator(phase: .down, isActive: currentPhase == .down)
+            }
+
+            // Große Phase-Anzeige mit Countdown
+            VStack(spacing: 4) {
+                Text(currentPhase.label)
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .foregroundStyle(currentPhase.color)
+
+                Text("\(phaseSecondsRemaining)")
+                    .font(.system(size: 56, weight: .bold, design: .rounded))
+                    .foregroundStyle(currentPhase.color)
+            }
+
+            // Fortschrittsbalken für aktuelle Phase
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(Color.gray.opacity(0.3))
+
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(currentPhase.color)
+                        .frame(width: geo.size.width * phaseProgress)
+                        .animation(.linear(duration: 0.2), value: phaseProgress)
+                }
+            }
+            .frame(height: 12)
+            .padding(.horizontal, 40)
+
+            // Wiederholungen
+            Text("Wiederholung \(repetitionCount)")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+
     private var timerDisplay: some View {
-        ZStack {
-            // Hintergrund-Ring
-            Circle()
-                .stroke(lineWidth: 20)
-                .foregroundStyle(.gray.opacity(0.2))
+        VStack(spacing: 8) {
+            if !isRunning && elapsedSeconds == 0 {
+                // Start-Anzeige
+                VStack(spacing: 16) {
+                    Text("Kieser Rhythmus")
+                        .font(.headline)
 
-            // Fortschritts-Ring
-            Circle()
-                .trim(from: 0, to: progress)
-                .stroke(
-                    timerColor,
-                    style: StrokeStyle(lineWidth: 20, lineCap: .round)
-                )
-                .rotationEffect(.degrees(-90))
-                .animation(.linear(duration: 0.5), value: progress)
+                    HStack(spacing: 16) {
+                        VStack {
+                            Image(systemName: "arrow.up")
+                                .font(.title2)
+                                .foregroundStyle(.green)
+                            Text("4 Sek.")
+                                .font(.caption)
+                            Text("HOCH")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
 
-            // Zeit-Anzeige
-            VStack(spacing: 8) {
-                if !isRunning && elapsedSeconds == 0 {
-                    Text("Bereit?")
-                        .font(.title)
-                        .foregroundStyle(.secondary)
-                } else if isOvertime {
-                    Text("+\(overtimeSeconds)")
-                        .font(.system(size: 72, weight: .bold, design: .rounded))
-                        .foregroundStyle(.orange)
-                    Text("ÜBERDAUER")
-                        .font(.caption)
-                        .foregroundStyle(.orange)
-                } else {
-                    Text("\(elapsedSeconds)")
-                        .font(.system(size: 72, weight: .bold, design: .rounded))
-                        .foregroundStyle(timerColor)
-                    Text("von \(targetDuration) Sekunden")
-                        .font(.caption)
+                        VStack {
+                            Image(systemName: "pause")
+                                .font(.title2)
+                                .foregroundStyle(.blue)
+                            Text("2 Sek.")
+                                .font(.caption)
+                            Text("HALTEN")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        VStack {
+                            Image(systemName: "arrow.down")
+                                .font(.title2)
+                                .foregroundStyle(.purple)
+                            Text("4 Sek.")
+                                .font(.caption)
+                            Text("RUNTER")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .padding()
+                    .background(.secondary.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                    Text("Tippe Start wenn du bereit bist")
+                        .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
+            } else {
+                // Gesamtzeit
+                HStack {
+                    Text("Gesamtzeit:")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    Text("\(elapsedSeconds)s")
+                        .font(.title3.bold())
+                        .foregroundStyle(isOvertime ? .orange : .primary)
+
+                    Text("/ \(targetDuration)s")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                }
+
+                // Fortschrittsbalken für Gesamtzeit
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.gray.opacity(0.3))
+
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(isOvertime ? Color.orange : Color.green)
+                            .frame(width: geo.size.width * progress)
+                    }
+                }
+                .frame(height: 8)
+                .padding(.horizontal, 40)
 
                 if isPaused {
                     Text("PAUSIERT")
@@ -161,47 +283,6 @@ struct WorkoutTimerView: View {
                 }
             }
         }
-        .frame(width: 280, height: 280)
-        .padding()
-    }
-
-    private var instructionText: some View {
-        VStack(spacing: 8) {
-            if !isRunning && elapsedSeconds == 0 {
-                Text("Starte wenn du bereit bist")
-                    .font(.headline)
-                Text("Führe die Bewegung langsam und kontrolliert aus")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            } else if elapsedSeconds < 30 {
-                Text("Langsam und kontrolliert")
-                    .font(.headline)
-                Text("4 Sekunden hoch, 4 Sekunden runter")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            } else if elapsedSeconds < 60 {
-                Text("Weiter so!")
-                    .font(.headline)
-                Text("Gleichmäßiges Tempo beibehalten")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            } else if elapsedSeconds < targetDuration {
-                Text("Endspurt!")
-                    .font(.headline)
-                    .foregroundStyle(.orange)
-                Text("Bis zur maximalen Erschöpfung")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            } else {
-                Text("Ziel erreicht!")
-                    .font(.headline)
-                    .foregroundStyle(.green)
-                Text("Stoppe wenn du erschöpft bist")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .multilineTextAlignment(.center)
     }
 
     private var controlButtons: some View {
@@ -262,18 +343,6 @@ struct WorkoutTimerView: View {
         .ignoresSafeArea()
     }
 
-    private var timerColor: Color {
-        if isOvertime {
-            return .orange
-        } else if elapsedSeconds >= targetDuration - 10 {
-            return .green
-        } else if elapsedSeconds >= targetDuration / 2 {
-            return .yellow
-        } else {
-            return .blue
-        }
-    }
-
     private var completionSheet: some View {
         NavigationStack {
             VStack(spacing: 24) {
@@ -285,6 +354,10 @@ struct WorkoutTimerView: View {
                     Text("\(elapsedSeconds) Sekunden")
                         .font(.system(size: 48, weight: .bold, design: .rounded))
                         .foregroundStyle(.orange)
+
+                    Text("\(repetitionCount) Wiederholungen")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
                 .padding(.top)
 
@@ -306,7 +379,7 @@ struct WorkoutTimerView: View {
                 // Empfehlung
                 VStack(spacing: 8) {
                     if reachedExhaustion && elapsedSeconds >= targetDuration {
-                        Label("Gewicht erhöhen beim nächsten Mal", systemImage: "arrow.up.circle.fill")
+                        Label("Gewicht um 5kg erhöhen", systemImage: "arrow.up.circle.fill")
                             .foregroundStyle(.green)
                     } else if elapsedSeconds >= targetDuration {
                         Label("Gewicht beibehalten", systemImage: "checkmark.circle.fill")
@@ -374,16 +447,81 @@ struct WorkoutTimerView: View {
     }
 
     private func playTickSound() {
-        // Haptic feedback bei wichtigen Zeitpunkten
+        // Haptic feedback bei Phasenwechsel
+        let sec = cycleSeconds
+        if sec == 0 || sec == 4 || sec == 6 {
+            // Phasenwechsel
+            let generator = UIImpactFeedbackGenerator(style: .medium)
+            generator.impactOccurred()
+        }
+
+        // Spezielle Feedback bei Zielzeit
         if elapsedSeconds == targetDuration {
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
-        } else if elapsedSeconds == targetDuration - 10 {
-            let generator = UIImpactFeedbackGenerator(style: .medium)
-            generator.impactOccurred()
-        } else if elapsedSeconds % 30 == 0 && elapsedSeconds > 0 {
-            let generator = UIImpactFeedbackGenerator(style: .light)
-            generator.impactOccurred()
+        }
+    }
+}
+
+// MARK: - Phase Indicator
+
+struct PhaseIndicator: View {
+    let phase: KieserPhase
+    let isActive: Bool
+
+    var body: some View {
+        VStack(spacing: 4) {
+            Image(systemName: phase.icon)
+                .font(.title3)
+                .foregroundStyle(isActive ? phase.color : .gray)
+
+            Text(phase.shortLabel)
+                .font(.caption2)
+                .foregroundStyle(isActive ? phase.color : .gray)
+        }
+        .padding(8)
+        .background(isActive ? phase.color.opacity(0.2) : Color.clear)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .animation(.easeInOut(duration: 0.2), value: isActive)
+    }
+}
+
+// MARK: - Kieser Phase
+
+enum KieserPhase {
+    case up     // 4 Sekunden hoch
+    case hold   // 2 Sekunden halten
+    case down   // 4 Sekunden runter
+
+    var label: String {
+        switch self {
+        case .up: return "HOCH"
+        case .hold: return "HALTEN"
+        case .down: return "RUNTER"
+        }
+    }
+
+    var shortLabel: String {
+        switch self {
+        case .up: return "4s"
+        case .hold: return "2s"
+        case .down: return "4s"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .up: return "arrow.up"
+        case .hold: return "pause"
+        case .down: return "arrow.down"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .up: return .green
+        case .hold: return .blue
+        case .down: return .purple
         }
     }
 }
