@@ -34,7 +34,7 @@ struct EditExpenseView: View {
         _selectedCategory = State(initialValue: expense.category)
         _selectedPayerId = State(initialValue: expense.payerId)
         _selectedDate = State(initialValue: expense.date)
-        _notes = State(initialValue: expense.notes ?? "")
+        _notes = State(initialValue: expense.notes)
         _splitType = State(initialValue: expense.splitType)
 
         // Initialize participant selection
