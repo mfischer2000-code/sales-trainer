@@ -365,7 +365,7 @@ struct EditExpenseView: View {
             splitType: splitType,
             shares: shares,
             date: selectedDate,
-            notes: notes.isEmpty ? nil : notes,
+            notes: notes,
             isSettled: expense.isSettled
         )
 
