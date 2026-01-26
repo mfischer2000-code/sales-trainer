@@ -7,6 +7,7 @@ struct GroupDetailView: View {
     @State private var selectedSegment = 0
     @State private var showingAddExpense = false
     @State private var showingExportSheet = false
+    @State private var editingExpense: Expense?
 
     private let segments = ["💳 Ausgaben", "⚖️ Salden", "📊 Stats"]
 
@@ -39,7 +40,7 @@ struct GroupDetailView: View {
                 // Content
                 switch selectedSegment {
                 case 0:
-                    ExpensesListView(group: currentGroup)
+                    ExpensesListView(group: currentGroup, editingExpense: $editingExpense)
                 case 1:
                     BalancesView(group: currentGroup)
                 case 2:
@@ -74,6 +75,9 @@ struct GroupDetailView: View {
         .sheet(isPresented: $showingExportSheet) {
             ExportView(group: currentGroup)
         }
+        .sheet(item: $editingExpense) { expense in
+            EditExpenseView(group: currentGroup, expense: expense)
+        }
         .onAppear {
             if let updatedGroup = dataManager.groups.first(where: { $0.id == group.id }) {
                 group = updatedGroup
@@ -87,6 +91,7 @@ struct GroupDetailView: View {
 
 struct ExpensesListView: View {
     let group: ExpenseGroup
+    @Binding var editingExpense: Expense?
     @EnvironmentObject var dataManager: DataManager
 
     var sortedExpenses: [Expense] {
@@ -111,7 +116,16 @@ struct ExpensesListView: View {
                 LazyVStack(spacing: 12) {
                     ForEach(sortedExpenses) { expense in
                         ExpenseRowView(expense: expense, group: group, showGroupName: false)
+                            .onTapGesture {
+                                editingExpense = expense
+                            }
                             .contextMenu {
+                                Button(action: {
+                                    editingExpense = expense
+                                }) {
+                                    Label("Bearbeiten", systemImage: "pencil")
+                                }
+
                                 Button(action: {
                                     dataManager.markExpenseAsSettled(expense.id, in: group.id, settled: !expense.isSettled)
                                 }) {
