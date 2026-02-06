@@ -24,6 +24,7 @@
 		015 /* ActiveWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 115; };
 		016 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 116; };
 		019 /* PhoneWatchConnectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117; };
+		020 /* DataSeeder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118; };
 		017 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 201; };
 		018 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 202; };
 		W001 /* KieserTrainerWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = W101; };
@@ -52,6 +53,7 @@
 		115 /* ActiveWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveWorkoutView.swift; sourceTree = "<group>"; };
 		116 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		117 /* PhoneWatchConnectivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchConnectivity.swift; sourceTree = "<group>"; };
+		118 /* DataSeeder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSeeder.swift; sourceTree = "<group>"; };
 		201 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		202 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		300 /* KieserTrainer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KieserTrainer.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -154,6 +156,7 @@
 			isa = PBXGroup;
 			children = (
 				117 /* PhoneWatchConnectivity.swift */,
+				118 /* DataSeeder.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -296,6 +299,7 @@
 				015 /* ActiveWorkoutView.swift in Sources */,
 				016 /* HistoryView.swift in Sources */,
 				019 /* PhoneWatchConnectivity.swift in Sources */,
+				020 /* DataSeeder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
