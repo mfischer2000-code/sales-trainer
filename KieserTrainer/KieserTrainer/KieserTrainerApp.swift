@@ -33,6 +33,9 @@ struct KieserTrainerApp: App {
         WindowGroup {
             ContentView()
                 .onAppear {
+                    // Standard-Übungen erstellen falls keine vorhanden
+                    DataSeeder.shared.seedIfNeeded(context: sharedModelContainer.mainContext)
+
                     // ModelContext für Watch-Sync bereitstellen
                     watchConnectivity.setModelContext(sharedModelContainer.mainContext)
                     watchConnectivity.syncExercisesWithWatch()

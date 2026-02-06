@@ -37,7 +37,7 @@ struct ActiveWorkoutView: View {
                     .background(.ultraThinMaterial)
 
                 if let exercise = currentExercise {
-                    // Timer View
+                    // Timer View - ID erzwingt Neuerstellen bei Übungswechsel
                     WorkoutTimerView(
                         exercise: exercise,
                         onComplete: { duration, exhaustion in
@@ -48,6 +48,7 @@ struct ActiveWorkoutView: View {
                             moveToNextExercise()
                         }
                     )
+                    .id(exercise.id)  // Wichtig: Timer wird bei jeder Übung neu erstellt
                 } else {
                     // Training beendet
                     workoutCompleteView
