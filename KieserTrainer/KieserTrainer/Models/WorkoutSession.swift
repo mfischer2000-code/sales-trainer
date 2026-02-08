@@ -15,7 +15,7 @@ final class WorkoutSession: Identifiable {
     var startTime: Date
     var endTime: Date?
     var notes: String
-    var trainingModeRaw: String  // Für SwiftData Persistenz
+    var trainingModeRaw: String = "Kieser"  // Für SwiftData Persistenz mit Standardwert
 
     @Relationship(deleteRule: .cascade)
     var exerciseLogs: [ExerciseLog]
