@@ -25,6 +25,8 @@
 		016 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 116; };
 		019 /* PhoneWatchConnectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117; };
 		020 /* DataSeeder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118; };
+		021 /* TrainingMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 119; };
+		022 /* ClassicWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 120; };
 		017 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 201; };
 		018 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 202; };
 		W001 /* KieserTrainerWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = W101; };
@@ -54,6 +56,8 @@
 		116 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		117 /* PhoneWatchConnectivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchConnectivity.swift; sourceTree = "<group>"; };
 		118 /* DataSeeder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSeeder.swift; sourceTree = "<group>"; };
+		119 /* TrainingMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingMode.swift; sourceTree = "<group>"; };
+		120 /* ClassicWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassicWorkoutView.swift; sourceTree = "<group>"; };
 		201 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		202 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		300 /* KieserTrainer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KieserTrainer.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -122,6 +126,7 @@
 				104 /* Machine.swift */,
 				105 /* WorkoutSession.swift */,
 				106 /* ExerciseLog.swift */,
+				119 /* TrainingMode.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -140,6 +145,7 @@
 				114 /* WorkoutStartView.swift */,
 				115 /* ActiveWorkoutView.swift */,
 				116 /* HistoryView.swift */,
+				120 /* ClassicWorkoutView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -300,6 +306,8 @@
 				016 /* HistoryView.swift in Sources */,
 				019 /* PhoneWatchConnectivity.swift in Sources */,
 				020 /* DataSeeder.swift in Sources */,
+				021 /* TrainingMode.swift in Sources */,
+				022 /* ClassicWorkoutView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

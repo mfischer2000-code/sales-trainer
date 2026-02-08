@@ -2,7 +2,7 @@
 //  WorkoutStartView.swift
 //  KieserTrainer
 //
-//  Startseite für ein neues Training
+//  Startseite für ein neues Training mit Trainingsart-Auswahl
 //
 
 import SwiftUI
@@ -13,19 +13,16 @@ struct WorkoutStartView: View {
     @Query(filter: #Predicate<Exercise> { $0.isActive }, sort: \Exercise.orderIndex) private var activeExercises: [Exercise]
     @Query(filter: #Predicate<WorkoutSession> { !$0.isCompleted }) private var activeSessions: [WorkoutSession]
 
-    @State private var presentedSession: WorkoutSession?
-
-    var lastCompletedSession: WorkoutSession? {
-        // Würde normalerweise eine Query sein, aber für die Preview vereinfacht
-        nil
-    }
+    @State private var selectedMode: TrainingMode = .kieser
+    @State private var presentedKieserSession: WorkoutSession?
+    @State private var presentedClassicSession: WorkoutSession?
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    // Hero Section
-                    heroSection
+                    // Trainingsart Auswahl
+                    trainingModeSelector
 
                     // Aktive Session fortsetzen
                     if let session = activeSessions.first {
@@ -46,35 +43,36 @@ struct WorkoutStartView: View {
                 }
                 .padding()
             }
-            .navigationTitle("Kieser Training")
-            .fullScreenCover(item: $presentedSession) { session in
+            .navigationTitle("Training")
+            .fullScreenCover(item: $presentedKieserSession) { session in
                 ActiveWorkoutView(session: session)
+            }
+            .fullScreenCover(item: $presentedClassicSession) { session in
+                ClassicWorkoutView(session: session)
+            }
+        }
+    }
+
+    // MARK: - Training Mode Selector
+
+    private var trainingModeSelector: some View {
+        VStack(spacing: 16) {
+            Text("Trainingsart wählen")
+                .font(.headline)
+
+            HStack(spacing: 12) {
+                ForEach(TrainingMode.allCases) { mode in
+                    TrainingModeCard(
+                        mode: mode,
+                        isSelected: selectedMode == mode,
+                        action: { selectedMode = mode }
+                    )
+                }
             }
         }
     }
 
     // MARK: - Subviews
-
-    private var heroSection: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "figure.strengthtraining.traditional")
-                .font(.system(size: 60))
-                .foregroundStyle(.orange)
-
-            Text("90 Sekunden")
-                .font(.title.bold())
-
-            Text("Bis zur maximalen Erschöpfung")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 40)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(.orange.opacity(0.1))
-        )
-    }
 
     private func continueSessionCard(_ session: WorkoutSession) -> some View {
         VStack(spacing: 12) {
@@ -85,6 +83,12 @@ struct WorkoutStartView: View {
                 Text("Laufendes Training")
                     .font(.headline)
                 Spacer()
+                Text(session.trainingMode.title)
+                    .font(.caption)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(session.trainingMode.color.opacity(0.2))
+                    .clipShape(Capsule())
             }
 
             HStack {
@@ -96,7 +100,11 @@ struct WorkoutStartView: View {
             .foregroundStyle(.secondary)
 
             Button(action: {
-                presentedSession = session
+                if session.trainingMode == .classic {
+                    presentedClassicSession = session
+                } else {
+                    presentedKieserSession = session
+                }
             }) {
                 Text("Fortsetzen")
                     .font(.headline)
@@ -117,17 +125,40 @@ struct WorkoutStartView: View {
 
     private var startWorkoutCard: some View {
         VStack(spacing: 16) {
+            // Mode Info
+            HStack(spacing: 16) {
+                Image(systemName: selectedMode.icon)
+                    .font(.title)
+                    .foregroundStyle(selectedMode.color)
+                    .frame(width: 50, height: 50)
+                    .background(selectedMode.color.opacity(0.1))
+                    .clipShape(Circle())
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(selectedMode.title)
+                        .font(.headline)
+                    Text(selectedMode.subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+            }
+
+            Text(selectedMode.description)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            Divider()
+
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Neues Training starten")
-                        .font(.headline)
                     Text("\(activeExercises.count) Übungen bereit")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
-                Image(systemName: "chevron.right")
-                    .foregroundStyle(.secondary)
             }
 
             Button(action: startNewWorkout) {
@@ -138,7 +169,7 @@ struct WorkoutStartView: View {
                 .font(.headline)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(.orange)
+                .background(selectedMode.color)
                 .foregroundStyle(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
             }
@@ -181,7 +212,7 @@ struct WorkoutStartView: View {
                 HStack {
                     Image(systemName: exercise.muscleGroup.icon)
                         .frame(width: 30)
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(selectedMode.color)
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text(exercise.name)
@@ -218,9 +249,53 @@ struct WorkoutStartView: View {
     // MARK: - Actions
 
     private func startNewWorkout() {
-        let session = WorkoutSession()
+        let session = WorkoutSession(trainingMode: selectedMode)
         modelContext.insert(session)
-        presentedSession = session
+
+        if selectedMode == .classic {
+            presentedClassicSession = session
+        } else {
+            presentedKieserSession = session
+        }
+    }
+}
+
+// MARK: - Training Mode Card
+
+struct TrainingModeCard: View {
+    let mode: TrainingMode
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 12) {
+                Image(systemName: mode.icon)
+                    .font(.title)
+                    .foregroundStyle(isSelected ? .white : mode.color)
+
+                Text(mode.title)
+                    .font(.subheadline.bold())
+                    .foregroundStyle(isSelected ? .white : .primary)
+
+                Text(mode.subtitle)
+                    .font(.caption2)
+                    .foregroundStyle(isSelected ? .white.opacity(0.8) : .secondary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(isSelected ? mode.color : mode.color.opacity(0.1))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(mode.color, lineWidth: isSelected ? 0 : 1)
+            )
+        }
+        .buttonStyle(.plain)
     }
 }
 

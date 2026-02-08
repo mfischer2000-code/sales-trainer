@@ -15,18 +15,25 @@ final class WorkoutSession: Identifiable {
     var startTime: Date
     var endTime: Date?
     var notes: String
+    var trainingModeRaw: String  // Für SwiftData Persistenz
 
     @Relationship(deleteRule: .cascade)
     var exerciseLogs: [ExerciseLog]
 
     var isCompleted: Bool
 
-    init(date: Date = Date(), notes: String = "") {
+    var trainingMode: TrainingMode {
+        get { TrainingMode(rawValue: trainingModeRaw) ?? .kieser }
+        set { trainingModeRaw = newValue.rawValue }
+    }
+
+    init(date: Date = Date(), notes: String = "", trainingMode: TrainingMode = .kieser) {
         self.id = UUID()
         self.date = date
         self.startTime = date
         self.endTime = nil
         self.notes = notes
+        self.trainingModeRaw = trainingMode.rawValue
         self.exerciseLogs = []
         self.isCompleted = false
     }
