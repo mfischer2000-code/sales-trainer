@@ -22,7 +22,24 @@ struct KieserTrainerApp: App {
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
-            fatalError("Konnte ModelContainer nicht erstellen: \(error)")
+            // Bei Schema-Fehler: Datenbank löschen und neu erstellen
+            print("Schema-Fehler: \(error). Versuche Datenbank zurückzusetzen...")
+
+            // Lösche die SwiftData Dateien
+            let url = URL.applicationSupportDirectory.appending(path: "default.store")
+            let walUrl = URL.applicationSupportDirectory.appending(path: "default.store-wal")
+            let shmUrl = URL.applicationSupportDirectory.appending(path: "default.store-shm")
+
+            try? FileManager.default.removeItem(at: url)
+            try? FileManager.default.removeItem(at: walUrl)
+            try? FileManager.default.removeItem(at: shmUrl)
+
+            // Nochmal versuchen
+            do {
+                return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            } catch {
+                fatalError("Konnte ModelContainer nicht erstellen: \(error)")
+            }
         }
     }()
 
