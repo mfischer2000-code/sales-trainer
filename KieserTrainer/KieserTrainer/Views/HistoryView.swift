@@ -111,7 +111,7 @@ struct StatisticBox: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(.secondary.opacity(0.1))
+        .background(Color.secondary.opacity(0.1))
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }

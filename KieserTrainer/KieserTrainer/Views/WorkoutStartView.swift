@@ -177,7 +177,7 @@ struct WorkoutStartView: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(.secondary.opacity(0.1))
+                .fill(Color.secondary.opacity(0.1))
         )
     }
 
@@ -242,7 +242,7 @@ struct WorkoutStartView: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(.secondary.opacity(0.05))
+                .fill(Color.secondary.opacity(0.05))
         )
     }
 

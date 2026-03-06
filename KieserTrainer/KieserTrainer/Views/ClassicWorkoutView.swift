@@ -404,7 +404,7 @@ struct ClassicSetView: View {
                         .font(.headline)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10)
-                        .background(.secondary.opacity(0.2))
+                        .background(Color.secondary.opacity(0.2))
                         .clipShape(Capsule())
                 }
 
@@ -413,7 +413,7 @@ struct ClassicSetView: View {
                         .font(.headline)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10)
-                        .background(.secondary.opacity(0.2))
+                        .background(Color.secondary.opacity(0.2))
                         .clipShape(Capsule())
                 }
             }
@@ -537,7 +537,7 @@ struct SetIndicator: View {
         } else if isActive {
             return .blue
         } else {
-            return .secondary.opacity(0.2)
+            return Color.secondary.opacity(0.2)
         }
     }
 }
@@ -616,7 +616,7 @@ struct ClassicWorkoutSummaryView: View {
                                     .foregroundStyle(.blue)
                             }
                             .padding()
-                            .background(.secondary.opacity(0.1))
+                            .background(Color.secondary.opacity(0.1))
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                             .padding(.horizontal)
                         }
@@ -656,7 +656,7 @@ struct ClassicStatCard: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(.secondary.opacity(0.1))
+        .background(Color.secondary.opacity(0.1))
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }

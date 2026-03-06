@@ -85,7 +85,7 @@ struct MachineRowView: View {
                         .foregroundStyle(.secondary)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
-                        .background(.secondary.opacity(0.1))
+                        .background(Color.secondary.opacity(0.1))
                         .clipShape(Capsule())
                 }
             }

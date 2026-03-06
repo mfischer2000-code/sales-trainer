@@ -237,7 +237,7 @@ struct WorkoutTimerView: View {
                         }
                     }
                     .padding()
-                    .background(.secondary.opacity(0.1))
+                    .background(Color.secondary.opacity(0.1))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
 
                     Text("Tippe Start wenn du bereit bist")
@@ -376,7 +376,7 @@ struct WorkoutTimerView: View {
                     }
                     .tint(.orange)
                     .padding()
-                    .background(.secondary.opacity(0.1))
+                    .background(Color.secondary.opacity(0.1))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
 
                     // Neues Gewicht einstellen
@@ -414,7 +414,7 @@ struct WorkoutTimerView: View {
                         }
                     }
                     .padding()
-                    .background(.secondary.opacity(0.1))
+                    .background(Color.secondary.opacity(0.1))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
 
                     Button(action: {

@@ -182,7 +182,7 @@ struct ActiveWorkoutView: View {
                             }
                         }
                         .padding()
-                        .background(isCompleted ? .secondary.opacity(0.05) : .secondary.opacity(0.1))
+                        .background(isCompleted ? Color.secondary.opacity(0.05) : Color.secondary.opacity(0.1))
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
                     .disabled(isCompleted)
@@ -345,7 +345,7 @@ struct WorkoutSummaryView: View {
                                 }
                             }
                             .padding()
-                            .background(.secondary.opacity(0.1))
+                            .background(Color.secondary.opacity(0.1))
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                             .padding(.horizontal)
                         }
@@ -385,7 +385,7 @@ struct StatCard: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(.secondary.opacity(0.1))
+        .background(Color.secondary.opacity(0.1))
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
