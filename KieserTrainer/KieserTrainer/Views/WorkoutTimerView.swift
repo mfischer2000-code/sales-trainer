@@ -550,7 +550,7 @@ enum KieserPhase {
 #Preview {
     WorkoutTimerView(
         exercise: Exercise(name: "Beinpresse", muscleGroup: .legs, currentWeight: 80),
-        onComplete: { _, _ in },
+        onComplete: { _, _, _ in },
         onSkip: { }
     )
 }
