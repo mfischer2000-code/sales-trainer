@@ -319,7 +319,7 @@ struct ClassicSetView: View {
                     .foregroundStyle(.secondary)
 
                 HStack(spacing: 20) {
-                    Button(action: { adjustWeight(-5) }) {
+                    Button(action: { adjustWeight(-1) }) {
                         Image(systemName: "minus.circle.fill")
                             .font(.title)
                             .foregroundStyle(.blue)
@@ -329,7 +329,7 @@ struct ClassicSetView: View {
                         .font(.system(size: 48, weight: .bold, design: .rounded))
                         .frame(minWidth: 150)
 
-                    Button(action: { adjustWeight(5) }) {
+                    Button(action: { adjustWeight(1) }) {
                         Image(systemName: "plus.circle.fill")
                             .font(.title)
                             .foregroundStyle(.blue)

@@ -384,8 +384,8 @@ struct WorkoutTimerView: View {
                         Text("Gewicht für nächstes Mal")
                             .font(.headline)
 
-                        HStack(spacing: 20) {
-                            Button(action: { newWeight = max(0, newWeight - 5) }) {
+                        HStack(spacing: 16) {
+                            Button(action: { newWeight = max(0, newWeight - 1) }) {
                                 Image(systemName: "minus.circle.fill")
                                     .font(.title)
                                     .foregroundStyle(.orange)
@@ -395,7 +395,7 @@ struct WorkoutTimerView: View {
                                 .font(.system(size: 40, weight: .bold, design: .rounded))
                                 .frame(minWidth: 120)
 
-                            Button(action: { newWeight += 5 }) {
+                            Button(action: { newWeight += 1 }) {
                                 Image(systemName: "plus.circle.fill")
                                     .font(.title)
                                     .foregroundStyle(.orange)
