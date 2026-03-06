@@ -10,7 +10,7 @@ import AVFoundation
 
 struct WorkoutTimerView: View {
     let exercise: Exercise
-    let onComplete: (Int, Bool) -> Void
+    let onComplete: (Int, Bool, Double) -> Void  // duration, exhaustion, newWeight
     let onSkip: () -> Void
 
     @State private var elapsedSeconds: Int = 0
@@ -18,17 +18,19 @@ struct WorkoutTimerView: View {
     @State private var isPaused = false
     @State private var showingCompletionSheet = false
     @State private var reachedExhaustion = false
+    @State private var newWeight: Double
     @State private var timer: Timer?
 
     @Environment(\.dismiss) private var dismiss
 
     private let targetDuration: Int
 
-    init(exercise: Exercise, onComplete: @escaping (Int, Bool) -> Void, onSkip: @escaping () -> Void) {
+    init(exercise: Exercise, onComplete: @escaping (Int, Bool, Double) -> Void, onSkip: @escaping () -> Void) {
         self.exercise = exercise
         self.onComplete = onComplete
         self.onSkip = onSkip
         self.targetDuration = exercise.targetDuration
+        _newWeight = State(initialValue: exercise.currentWeight)
     }
 
     var progress: Double {
@@ -345,76 +347,95 @@ struct WorkoutTimerView: View {
 
     private var completionSheet: some View {
         NavigationStack {
-            VStack(spacing: 24) {
-                // Ergebnis
-                VStack(spacing: 8) {
-                    Text(elapsedSeconds >= targetDuration ? "Ziel erreicht!" : "Training beendet")
-                        .font(.title.bold())
+            ScrollView {
+                VStack(spacing: 24) {
+                    // Ergebnis
+                    VStack(spacing: 8) {
+                        Text(elapsedSeconds >= targetDuration ? "Ziel erreicht!" : "Training beendet")
+                            .font(.title.bold())
 
-                    Text("\(elapsedSeconds) Sekunden")
-                        .font(.system(size: 48, weight: .bold, design: .rounded))
-                        .foregroundStyle(.orange)
+                        Text("\(elapsedSeconds) Sekunden")
+                            .font(.system(size: 48, weight: .bold, design: .rounded))
+                            .foregroundStyle(.orange)
 
-                    Text("\(repetitionCount) Wiederholungen")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-                .padding(.top)
-
-                // Erschöpfung Toggle
-                Toggle(isOn: $reachedExhaustion) {
-                    VStack(alignment: .leading) {
-                        Text("Maximale Erschöpfung erreicht")
-                            .font(.headline)
-                        Text("Konnte keine weitere Wiederholung machen")
-                            .font(.caption)
+                        Text("\(repetitionCount) Wiederholungen")
+                            .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
-                }
-                .tint(.orange)
-                .padding()
-                .background(.secondary.opacity(0.1))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .padding(.top)
 
-                // Empfehlung
-                VStack(spacing: 8) {
-                    if reachedExhaustion && elapsedSeconds >= targetDuration {
-                        Label("Gewicht um 5kg erhöhen", systemImage: "arrow.up.circle.fill")
-                            .foregroundStyle(.green)
-                    } else if elapsedSeconds >= targetDuration {
-                        Label("Gewicht beibehalten", systemImage: "checkmark.circle.fill")
-                            .foregroundStyle(.blue)
-                    } else {
-                        Label("Mehr Zeit beim nächsten Mal", systemImage: "clock.fill")
-                            .foregroundStyle(.orange)
+                    // Erschöpfung Toggle
+                    Toggle(isOn: $reachedExhaustion) {
+                        VStack(alignment: .leading) {
+                            Text("Maximale Erschöpfung erreicht")
+                                .font(.headline)
+                            Text("Konnte keine weitere Wiederholung machen")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .tint(.orange)
+                    .padding()
+                    .background(.secondary.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                    // Neues Gewicht einstellen
+                    VStack(spacing: 12) {
+                        Text("Gewicht für nächstes Mal")
+                            .font(.headline)
+
+                        HStack(spacing: 20) {
+                            Button(action: { newWeight = max(0, newWeight - 5) }) {
+                                Image(systemName: "minus.circle.fill")
+                                    .font(.title)
+                                    .foregroundStyle(.orange)
+                            }
+
+                            Text("\(Int(newWeight)) kg")
+                                .font(.system(size: 40, weight: .bold, design: .rounded))
+                                .frame(minWidth: 120)
+
+                            Button(action: { newWeight += 5 }) {
+                                Image(systemName: "plus.circle.fill")
+                                    .font(.title)
+                                    .foregroundStyle(.orange)
+                            }
+                        }
+
+                        if newWeight != exercise.currentWeight {
+                            let diff = newWeight - exercise.currentWeight
+                            Text(diff > 0 ? "+\(Int(diff)) kg" : "\(Int(diff)) kg")
+                                .font(.subheadline.bold())
+                                .foregroundStyle(diff > 0 ? .green : .red)
+                        } else {
+                            Text("Gewicht beibehalten")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .padding()
+                    .background(.secondary.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                    Button(action: {
+                        showingCompletionSheet = false
+                        onComplete(elapsedSeconds, reachedExhaustion, newWeight)
+                    }) {
+                        Text("Weiter")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(.orange)
+                            .foregroundStyle(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
                 }
-                .font(.subheadline)
                 .padding()
-                .frame(maxWidth: .infinity)
-                .background(.secondary.opacity(0.1))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-
-                Spacer()
-
-                Button(action: {
-                    showingCompletionSheet = false
-                    onComplete(elapsedSeconds, reachedExhaustion)
-                }) {
-                    Text("Weiter zur nächsten Übung")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(.orange)
-                        .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                }
             }
-            .padding()
             .navigationTitle("Übung abgeschlossen")
             .navigationBarTitleDisplayMode(.inline)
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.large])
     }
 
     // MARK: - Timer Logic

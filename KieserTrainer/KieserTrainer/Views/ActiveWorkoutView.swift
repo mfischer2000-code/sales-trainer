@@ -15,17 +15,17 @@ struct ActiveWorkoutView: View {
 
     @Bindable var session: WorkoutSession
 
-    @State private var currentExerciseIndex = 0
+    @State private var selectedExercise: Exercise?
+    @State private var completedExerciseIDs: Set<UUID> = []
     @State private var showingExitConfirmation = false
     @State private var showingSummary = false
 
-    var currentExercise: Exercise? {
-        guard currentExerciseIndex < exercises.count else { return nil }
-        return exercises[currentExerciseIndex]
+    var completedCount: Int {
+        completedExerciseIDs.count
     }
 
-    var completedCount: Int {
-        session.exerciseLogs.count
+    var remainingExercises: [Exercise] {
+        exercises.filter { !completedExerciseIDs.contains($0.id) }
     }
 
     var body: some View {
@@ -36,22 +36,25 @@ struct ActiveWorkoutView: View {
                     .padding()
                     .background(.ultraThinMaterial)
 
-                if let exercise = currentExercise {
+                if let exercise = selectedExercise {
                     // Timer View - ID erzwingt Neuerstellen bei Übungswechsel
                     WorkoutTimerView(
                         exercise: exercise,
-                        onComplete: { duration, exhaustion in
-                            logExercise(exercise: exercise, duration: duration, reachedExhaustion: exhaustion)
-                            moveToNextExercise()
+                        onComplete: { duration, exhaustion, newWeight in
+                            logExercise(exercise: exercise, duration: duration, reachedExhaustion: exhaustion, newWeight: newWeight)
+                            completedExerciseIDs.insert(exercise.id)
+                            selectedExercise = nil
                         },
                         onSkip: {
-                            moveToNextExercise()
+                            selectedExercise = nil
                         }
                     )
-                    .id(exercise.id)  // Wichtig: Timer wird bei jeder Übung neu erstellt
-                } else {
-                    // Training beendet
+                    .id(exercise.id)
+                } else if remainingExercises.isEmpty {
                     workoutCompleteView
+                } else {
+                    // Übungsauswahl
+                    exerciseSelectionView
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -104,24 +107,103 @@ struct ActiveWorkoutView: View {
             }
             .frame(height: 8)
 
-            // Progress Text
             HStack {
-                Text("Übung \(min(currentExerciseIndex + 1, exercises.count)) von \(exercises.count)")
+                Text("\(completedCount) von \(exercises.count) abgeschlossen")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
 
                 Spacer()
 
-                Text("\(completedCount) abgeschlossen")
-                    .font(.caption)
-                    .foregroundStyle(.orange)
+                if selectedExercise != nil {
+                    Text("Übung läuft")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                } else {
+                    Text("Übung wählen")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                }
             }
         }
     }
 
     private var progressPercentage: Double {
         guard !exercises.isEmpty else { return 0 }
-        return Double(currentExerciseIndex) / Double(exercises.count)
+        return Double(completedCount) / Double(exercises.count)
+    }
+
+    private var exerciseSelectionView: some View {
+        ScrollView {
+            VStack(spacing: 8) {
+                Text("Nächste Übung wählen")
+                    .font(.title3.bold())
+                    .padding(.top)
+
+                ForEach(exercises) { exercise in
+                    let isCompleted = completedExerciseIDs.contains(exercise.id)
+
+                    Button(action: {
+                        if !isCompleted {
+                            selectedExercise = exercise
+                        }
+                    }) {
+                        HStack(spacing: 12) {
+                            Image(systemName: exercise.muscleGroup.icon)
+                                .font(.title2)
+                                .foregroundStyle(isCompleted ? .gray : .orange)
+                                .frame(width: 44, height: 44)
+                                .background(isCompleted ? .gray.opacity(0.1) : .orange.opacity(0.1))
+                                .clipShape(Circle())
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(exercise.name)
+                                    .font(.headline)
+                                    .foregroundStyle(isCompleted ? .secondary : .primary)
+
+                                HStack {
+                                    Text(exercise.formattedWeight)
+                                    if let machine = exercise.machine {
+                                        Text("• \(machine.name)")
+                                    }
+                                }
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            }
+
+                            Spacer()
+
+                            if isCompleted {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.title2)
+                                    .foregroundStyle(.green)
+                            } else {
+                                Image(systemName: "chevron.right")
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .padding()
+                        .background(isCompleted ? .secondary.opacity(0.05) : .secondary.opacity(0.1))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                    .disabled(isCompleted)
+                }
+
+                // Training beenden Button wenn mindestens eine Übung gemacht
+                if completedCount > 0 {
+                    Button(action: { endWorkout() }) {
+                        Text("Training beenden (\(completedCount)/\(exercises.count))")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(.orange)
+                            .foregroundStyle(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                    .padding(.top, 8)
+                }
+            }
+            .padding(.horizontal)
+        }
     }
 
     private var workoutCompleteView: some View {
@@ -166,7 +248,7 @@ struct ActiveWorkoutView: View {
 
     // MARK: - Actions
 
-    private func logExercise(exercise: Exercise, duration: Int, reachedExhaustion: Bool) {
+    private func logExercise(exercise: Exercise, duration: Int, reachedExhaustion: Bool, newWeight: Double) {
         let log = ExerciseLog(
             weight: exercise.currentWeight,
             duration: duration,
@@ -180,20 +262,9 @@ struct ActiveWorkoutView: View {
         session.exerciseLogs.append(log)
         exercise.logs.append(log)
 
-        // Gewichtsempfehlung umsetzen
-        if reachedExhaustion && duration >= exercise.targetDuration {
-            exercise.currentWeight += exercise.weightIncrement
-            exercise.updatedAt = Date()
-        }
-    }
-
-    private func moveToNextExercise() {
-        if currentExerciseIndex < exercises.count - 1 {
-            currentExerciseIndex += 1
-        } else {
-            // Alle Übungen abgeschlossen
-            currentExerciseIndex = exercises.count
-        }
+        // Gewicht auf den vom User gewählten Wert setzen
+        exercise.currentWeight = newWeight
+        exercise.updatedAt = Date()
     }
 
     private func endWorkout() {
