@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EDIFACT Konverter - Bidirektional</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div>
+      <h1>EDIFACT Konverter</h1>
+      <div class="subtitle">Bidirektionale Konvertierung: EDIFACT &harr; JSON &harr; XML</div>
+    </div>
+    <div class="header-badges">
+      <span class="badge badge-info">UN/EDIFACT</span>
+      <span class="badge badge-success">v1.0</span>
+    </div>
+  </header>
+
+  <!-- Toolbar -->
+  <div class="app-container">
+    <div class="toolbar">
+      <div class="toolbar-group">
+        <label class="toolbar-label">Aktion:</label>
+        <button class="btn btn-primary" onclick="convertInput()" id="btnConvert" title="Eingabe konvertieren">
+          &#x21C4; Konvertieren
+        </button>
+        <button class="btn" onclick="swapPanels()" title="Eingabe und Ausgabe tauschen">
+          &#x21CB; Tauschen
+        </button>
+      </div>
+
+      <div class="toolbar-divider"></div>
+
+      <div class="toolbar-group">
+        <label class="toolbar-label">Eingabeformat:</label>
+        <select class="toolbar-select" id="inputFormat" onchange="onFormatChange()">
+          <option value="edifact">EDIFACT</option>
+          <option value="json">JSON</option>
+          <option value="xml">XML</option>
+        </select>
+      </div>
+
+      <div class="toolbar-group">
+        <label class="toolbar-label">Ausgabeformat:</label>
+        <select class="toolbar-select" id="outputFormat" onchange="onFormatChange()">
+          <option value="json">JSON</option>
+          <option value="xml">XML</option>
+          <option value="edifact">EDIFACT</option>
+        </select>
+      </div>
+
+      <div class="toolbar-divider"></div>
+
+      <div class="toolbar-group">
+        <label class="toolbar-label">Beispiel:</label>
+        <select class="toolbar-select" id="exampleSelect" onchange="loadExample()">
+          <option value="">-- Beispiel laden --</option>
+          <option value="orders">ORDERS (Bestellung)</option>
+          <option value="invoic">INVOIC (Rechnung)</option>
+          <option value="desadv">DESADV (Lieferavis)</option>
+        </select>
+      </div>
+
+      <div class="toolbar-divider"></div>
+
+      <div class="toolbar-group">
+        <button class="btn" onclick="document.getElementById('fileInput').click()" title="Datei laden">
+          &#x1F4C2; Datei laden
+        </button>
+        <button class="btn" onclick="downloadOutput()" title="Ausgabe herunterladen">
+          &#x1F4BE; Speichern
+        </button>
+        <button class="btn" onclick="copyOutput()" title="Ausgabe in Zwischenablage kopieren">
+          &#x1F4CB; Kopieren
+        </button>
+      </div>
+
+      <input type="file" id="fileInput" class="file-input" accept=".edi,.edifact,.json,.xml,.txt" onchange="handleFileUpload(event)">
+    </div>
+
+    <!-- Editor -->
+    <div class="editor-container">
+      <!-- Input Panel -->
+      <div class="editor-panel">
+        <div class="panel-header">
+          <span class="panel-title" id="inputPanelTitle">
+            &#x1F4E5; Eingabe (EDIFACT)
+          </span>
+          <div class="panel-actions">
+            <button class="btn btn-sm" onclick="clearInput()">Leeren</button>
+            <button class="btn btn-sm" onclick="formatInput()">Formatieren</button>
+          </div>
+        </div>
+        <div class="editor-area" id="inputDropZone">
+          <textarea id="inputEditor" placeholder="EDIFACT-Nachricht hier einfuegen oder Datei per Drag &amp; Drop ablegen...
+
+Beispiel:
+UNA:+.? '
+UNB+UNOC:3+SENDER:14+RECEIVER:14+260312:1430+123456'
+UNH+1+ORDERS:D:96A:UN'
+BGM+220+PO-001+9'
+..."
+            spellcheck="false"></textarea>
+          <div class="drop-zone" id="dropOverlay">
+            <span class="drop-zone-text">Datei hier ablegen</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Output Panel -->
+      <div class="editor-panel">
+        <div class="panel-header">
+          <span class="panel-title" id="outputPanelTitle">
+            &#x1F4E4; Ausgabe (JSON)
+          </span>
+          <div class="panel-actions">
+            <button class="btn btn-sm" onclick="copyOutput()">Kopieren</button>
+          </div>
+        </div>
+        <div class="panel-tabs">
+          <button class="panel-tab active" data-tab="formatted" onclick="switchTab(this, 'formatted')">Formatiert</button>
+          <button class="panel-tab" data-tab="raw" onclick="switchTab(this, 'raw')">Roh</button>
+          <button class="panel-tab" data-tab="tree" onclick="switchTab(this, 'tree')">Analyse</button>
+        </div>
+        <div class="editor-area">
+          <textarea id="outputEditor" readonly placeholder="Konvertierte Ausgabe erscheint hier..." spellcheck="false"></textarea>
+          <div id="treeView" class="tree-view" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="status-item">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">Bereit</span>
+    </div>
+    <div class="status-item">
+      <span id="statsText">Keine Daten</span>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/edifact-schemas.js"></script>
+  <script src="js/edifact-parser.js"></script>
+  <script src="js/edifact-generator.js"></script>
+  <script src="js/xml-converter.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
