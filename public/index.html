@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WITY Discovery Trainer – SEEBURGER</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', system-ui, sans-serif; background: #F5F5F2; color: #1B1B1B; min-height: 100vh; }
+
+  /* SELECT SCREEN */
+  #select-screen { display: block; max-width: 920px; margin: 0 auto; padding: 40px 24px; }
+  .header-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .header-bar .line { width: 28px; height: 3px; background: #2E7D32; border-radius: 2px; }
+  .header-bar .tag { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: #2E7D32; text-transform: uppercase; font-family: 'DM Mono', monospace; }
+  h1.main-title { font-family: 'Fraunces', serif; font-size: 36px; font-weight: 700; color: #1B1B1B; margin: 6px 0 10px; }
+  .subtitle { font-size: 15px; color: #666; line-height: 1.6; max-width: 580px; margin-bottom: 36px; }
+  .persona-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(390px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .persona-card { background: #fff; border-radius: 12px; padding: 24px; cursor: pointer; border: 1px solid #E8E8E8; transition: all 0.2s ease; position: relative; overflow: hidden; }
+  .persona-card:hover { border-color: #2E7D32; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(46,125,50,0.1); }
+  .persona-card .top-bar { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #2E7D32; }
+  .persona-card .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .persona-card h3 { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; color: #1B1B1B; }
+  .persona-card .sub { font-size: 12px; color: #888; margin-top: 2px; }
+  .diff-badge { font-size: 10px; font-weight: 700; color: #fff; padding: 3px 10px; border-radius: 20px; font-family: 'DM Mono', monospace; }
+  .persona-card .context { font-size: 13px; color: #555; line-height: 1.55; margin-bottom: 14px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .tag-pill { font-size: 11px; color: #2E7D32; background: #E8F5E9; padding: 3px 10px; border-radius: 20px; font-family: 'DM Mono', monospace; }
+  .card-footer { border-top: 1px solid #F0F0F0; padding-top: 12px; display: flex; justify-content: space-between; align-items: center; }
+  .card-footer .start-link { font-size: 13px; color: #2E7D32; font-weight: 600; }
+  .card-footer .industry { font-size: 12px; color: #AAA; }
+  .tip-box { padding: 14px 18px; background: #F0F7F0; border-radius: 8px; border-left: 3px solid #2E7D32; }
+  .tip-box p { font-size: 13px; color: #555; line-height: 1.6; }
+
+  /* CHAT SCREEN */
+  #chat-screen { display: none; height: 100vh; flex-direction: column; }
+  .chat-header { background: #fff; border-bottom: 1px solid #E8E8E8; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .chat-header-left { display: flex; align-items: center; gap: 12px; }
+  .back-btn { background: none; border: none; cursor: pointer; font-size: 18px; color: #888; padding: 0; }
+  .persona-name-row { display: flex; align-items: center; gap: 6px; }
+  .persona-name-row h2 { font-size: 15px; font-weight: 700; color: #1B1B1B; }
+  .persona-role { font-size: 12px; color: #888; }
+  .chat-header-right { display: flex; align-items: center; gap: 12px; }
+  .round-counter { font-size: 12px; color: #AAA; font-family: 'DM Mono', monospace; }
+  .btn-feedback { padding: 8px 16px; background: #2E7D32; color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-feedback:hover { background: #1B5E20; }
+  .messages-area { flex: 1; overflow-y: auto; padding: 20px; }
+  .wity-hint { background: #F0F7F0; border-radius: 8px; padding: 10px 14px; margin-bottom: 20px; display: flex; gap: 10px; }
+  .wity-hint p { font-size: 12px; color: #555; line-height: 1.5; }
+  .message-row { display: flex; margin-bottom: 12px; }
+  .message-row.seller { justify-content: flex-end; }
+  .bubble { max-width: 75%; padding: 12px 16px; border-radius: 14px; font-size: 14px; line-height: 1.55; white-space: pre-wrap; }
+  .bubble.seller { background: #2E7D32; color: #fff; }
+  .bubble.persona { background: #fff; color: #1B1B1B; border: 1px solid #E8E8E8; }
+  .persona-label { font-size: 11px; font-weight: 700; color: #2E7D32; margin-bottom: 4px; font-family: 'DM Mono', monospace; }
+  .typing-bubble { background: #fff; border: 1px solid #E8E8E8; border-radius: 14px; padding: 12px 20px; display: flex; gap: 5px; align-items: center; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #CCC; animation: pulse 1s ease-in-out infinite; }
+  .dot:nth-child(2) { animation-delay: 0.15s; } .dot:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes pulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
+  .error-msg { background: #FFEBEE; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; font-size: 13px; color: #D32F2F; }
+  .input-area { background: #fff; border-top: 1px solid #E8E8E8; padding: 12px 16px; flex-shrink: 0; }
+  .input-row { display: flex; gap: 10px; max-width: 820px; margin: 0 auto; }
+  .input-row input { flex: 1; padding: 12px 16px; border-radius: 10px; border: 1px solid #DDD; font-size: 14px; outline: none; font-family: 'DM Sans', sans-serif; }
+  .input-row input:focus { border-color: #2E7D32; }
+  .send-btn { padding: 12px 20px; background: #2E7D32; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; flex-shrink: 0; }
+  .send-btn:disabled { background: #CCC; cursor: default; }
+  .bottom-actions { display: flex; justify-content: center; gap: 16px; margin-top: 8px; }
+  .link-btn { background: none; border: none; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .link-btn.green { color: #2E7D32; font-weight: 600; }
+  .link-btn.gray { color: #999; }
+
+  /* FEEDBACK SCREEN */
+  #feedback-screen { display: none; max-width: 800px; margin: 0 auto; padding: 40px 24px; }
+  .back-link { background: none; border: none; color: #2E7D32; font-size: 14px; font-weight: 600; cursor: pointer; padding: 0; margin-bottom: 24px; display: block; }
+  .spinner { width: 40px; height: 40px; border: 3px solid #E8F5E9; border-top-color: #2E7D32; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .loading-box { text-align: center; padding: 80px 0; }
+  .score-card { background: #fff; border-radius: 12px; padding: 28px; border: 1px solid #E8E8E8; margin-bottom: 20px; display: flex; align-items: center; gap: 20px; }
+  .score-circle { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border-width: 3px; border-style: solid; flex-shrink: 0; }
+  .score-circle span { font-size: 28px; font-weight: 700; font-family: 'DM Mono', monospace; }
+  .score-card h2 { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; color: #1B1B1B; margin-bottom: 4px; }
+  .score-card p { font-size: 14px; color: #666; line-height: 1.5; }
+  .kategorie-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+  .kat-card { background: #fff; border-radius: 10px; padding: 20px; border: 1px solid #E8E8E8; }
+  .kat-card h3 { font-size: 15px; font-weight: 700; color: #1B1B1B; margin-bottom: 10px; }
+  .score-bar-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .score-bar-bg { flex: 1; height: 8px; background: #E8E8E8; border-radius: 4px; overflow: hidden; }
+  .score-bar-fill { height: 100%; border-radius: 4px; }
+  .score-label { font-weight: 700; font-size: 15px; min-width: 28px; text-align: right; font-family: 'DM Mono', monospace; }
+  .kat-feedback { font-size: 13px; color: #555; line-height: 1.55; }
+  .kat-beispiel { margin-top: 8px; padding: 8px 12px; background: #F8F8F6; border-radius: 6px; border-left: 2px solid #CCC; font-size: 12px; color: #777; font-style: italic; }
+  .hidden-pain-box { border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+  .hp-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .hidden-pain-box p { font-size: 13px; color: #555; line-height: 1.55; }
+  .tipp-card { background: #fff; border-radius: 10px; padding: 20px; border: 2px solid #2E7D32; margin-bottom: 28px; }
+  .tipp-label { font-size: 12px; font-weight: 700; color: #2E7D32; letter-spacing: 1px; font-family: 'DM Mono', monospace; margin-bottom: 8px; }
+  .tipp-card p { font-size: 15px; color: #1B1B1B; line-height: 1.55; font-weight: 500; }
+  .action-row { display: flex; gap: 12px; }
+  .btn-green { flex: 1; padding: 14px 20px; background: #2E7D32; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .btn-green:hover { background: #1B5E20; }
+  .btn-outline { flex: 1; padding: 14px 20px; background: #fff; color: #2E7D32; border: 2px solid #2E7D32; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div id="select-screen">
+  <div class="header-bar"><div class="line"></div><span class="tag">WITY Discovery Training</span></div>
+  <h1 class="main-title">KI-Sparringspartner</h1>
+  <p class="subtitle">Trainiere dein WITY-Discovery-Gespräch gegen realistische Schweizer Buyer Personas. Wähle eine Persona und führe das Gespräch – am Ende bekommst du strukturiertes Feedback.</p>
+  <div class="persona-grid" id="persona-grid"></div>
+  <div class="tip-box"><p><strong style="color:#2E7D32;">WITY-Framework:</strong> Öffnung → Pain → Vision → Next Step. Zu frühes Pitching wird bestraft, gute Fragen werden belohnt.</p></div>
+</div>
+
+<div id="chat-screen">
+  <div class="chat-header">
+    <div class="chat-header-left">
+      <button class="back-btn" onclick="showSelect()">←</button>
+      <div>
+        <div class="persona-name-row">
+          <h2 id="chat-name"></h2>
+          <span id="chat-diff-badge" class="diff-badge"></span>
+        </div>
+        <p class="persona-role" id="chat-role"></p>
+      </div>
+    </div>
+    <div class="chat-header-right">
+      <span class="round-counter" id="round-counter">Runde 0/12</span>
+      <button class="btn-feedback" id="feedback-btn" style="display:none" onclick="requestFeedback()">Feedback anfordern</button>
+    </div>
+  </div>
+  <div class="messages-area" id="messages-area">
+    <div class="wity-hint"><span style="font-size:14px;flex-shrink:0">💡</span><p><strong>WITY:</strong> Öffnung → Pain → Vision → Next Step</p></div>
+    <div id="messages-list"></div>
+    <div id="typing-indicator" style="display:none" class="message-row persona"><div class="typing-bubble"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
+    <div id="chat-error" class="error-msg" style="display:none"></div>
+    <div id="scroll-anchor"></div>
+  </div>
+  <div class="input-area">
+    <div class="input-row">
+      <input type="text" id="msg-input" placeholder="Deine Nachricht als Seller…" onkeydown="handleKey(event)" />
+      <button class="send-btn" id="send-btn" onclick="sendMessage()">Senden</button>
+    </div>
+    <div class="bottom-actions">
+      <button class="link-btn green" id="bottom-feedback-btn" style="display:none" onclick="requestFeedback()">📊 Feedback anfordern</button>
+      <button class="link-btn gray" onclick="restartChat()">↺ Neu starten</button>
+    </div>
+  </div>
+</div>
+
+<div id="feedback-screen">
+  <button class="back-link" onclick="showSelect()">← Zurück zur Persona-Auswahl</button>
+  <div class="header-bar"><div class="line"></div><span class="tag">Auswertung</span></div>
+  <h1 class="main-title" style="font-family:'Fraunces',serif;font-size:30px;margin-bottom:4px">Dein WITY-Feedback</h1>
+  <p style="font-size:14px;color:#888;margin-bottom:28px" id="feedback-meta"></p>
+  <div id="feedback-content"></div>
+</div>
+
+<script>
+const PERSONAS = [
+  { id:"pharma-zuerich", name:"Thomas Brunner", role:"IT-Leiter", company:"Pharmatech AG, Zürich", industry:"Pharma", difficulty:"Mittel", diffColor:"#FF8F00", context:"Mittelständisches Pharmaunternehmen, 1.200 Mitarbeiter. Mitten in der S/4HANA-Migration (Go-Live Q3 2026). Nutzt aktuell einen Mix aus altem SEEBURGER EDI On-Premise und manuelle CSV-Uploads. Hauptsorge: Die EDI-Schnittstellen könnten bei der Migration brechen. Budget ist genehmigt für die S/4HANA-Migration, aber Integration war im Scope 'vergessen' worden.", personality:"Offen und fachlich versiert, aber skeptisch gegenüber neuen Anbietern. Will Beweise und Referenzen aus der Pharma-Branche. Wird ungeduldig, wenn der Seller zu früh pitcht. Schweizer Mentalität: höflich, aber direkt.", hiddenPain:"Sein Chef (COO) hat ihn persönlich für die pünktliche S/4HANA-Migration verantwortlich gemacht. Wenn die Integration die Migration verzögert, steht sein Bonus und möglicherweise seine Position auf dem Spiel.", triggers:["S/4HANA-Migration","EDI-Integration","Pharma-Compliance","GxP-Validierung"] },
+  { id:"retail-romandie", name:"Marie-Claire Dupont", role:"CIO", company:"Groupe Alpin Retail, Lausanne", industry:"Retail", difficulty:"Schwer", diffColor:"#D32F2F", context:"Großer Schweizer Retailer mit 45 Filialen, Online-Shop und komplexer Lieferkette. Drei verschiedene Integrationstools, drei verschiedene Teams, drei verschiedene Budgets. Total überfordert.", personality:"Extrem wenig Zeit. Will auf den Punkt kommen. Hasst PowerPoint und Feature-Listen. Wird sofort abschalten, wenn der Seller generisch wird.", hiddenPain:"Der Verwaltungsrat hat ein Digitalisierungsprogramm verabschiedet. Sie muss die Integrationskosten bis Ende 2026 um 30% senken. Wenn sie das nicht schafft, wird ein externer Berater geholt.", triggers:["Tool-Konsolidierung","Kostenreduktion","Multi-Channel-Integration","Lieferketten-EDI"] },
+  { id:"automotive-sc", name:"Andreas Keller", role:"Head of Supply Chain", company:"PrecisionMotion AG, Winterthur", industry:"Automotive", difficulty:"Mittel", diffColor:"#FF8F00", context:"Tier-1 Automotive-Zulieferer mit 4 Werken (CH, DE, CZ, MX). Nach einer Akquisition gibt es jetzt 4 verschiedene EDI-Systeme. SEEBURGER wird in 2 der 4 Werke bereits eingesetzt.", personality:"Zahlenmensch. Will ROI, Payback-Period, TCO-Vergleiche. Fragt immer 'Was kostet mich das?' und 'Was spare ich damit?'.", hiddenPain:"Die OEMs (BMW, Stellantis) drohen mit Strafzahlungen wegen verspäteter ASN-Meldungen. Letztes Quartal: CHF 340K Konventionalstrafen. Der CEO hat das Thema zur Chefsache erklärt.", triggers:["EDI-Konsolidierung","M&A-Integration","OEM-Compliance","Multi-Plant"] },
+  { id:"kmu-cfo", name:"Beat Zimmermann", role:"CFO & GL-Mitglied", company:"Helvetia Mechanik GmbH, Solothurn", industry:"Maschinenbau KMU", difficulty:"Schwer", diffColor:"#D32F2F", context:"Traditionelles Schweizer KMU, 180 Mitarbeiter. Kein dedizierter IT-Leiter. Integration läuft über Excel und E-Mail. Hört 'iPaaS' zum ersten Mal.", personality:"Bodenständig, sparsam, skeptisch. Denkt in Franken und Rappen. Wird grantig bei Buzzwords.", hiddenPain:"Sein größter Kunde (35% des Umsatzes) akzeptiert ab 2027 nur noch EDI-basierte Bestellungen. Er hat keine Ahnung, was er tun soll.", triggers:["Kundenforderung-EDI","KMU-Digitalisierung","Einfachheit","Kosteneffizienz"] }
+];
+
+const SYS_BASE = `Du bist ein Schweizer Geschäftsentscheider im Rollenspiel-Training für SEEBURGER-Vertrieb.
+- Spiele die Persona REALISTISCH. Schweizer Hochdeutsch, höflich aber direkt.
+- Gib Infos nur bei guten Fragen preis. Hidden Pain nur bei sehr gutem Seller.
+- 2-4 Sätze. Bei Feature-Pitch ohne Verständnis: "Was hat das konkret mit meiner Situation zu tun?"
+- Antworte IMMER auf Deutsch.`;
+
+const FEEDBACK_SYS = `Du bist ein B2B-Sales-Coach. Analysiere das WITY-Discovery-Gespräch.
+Antworte NUR mit JSON (keine Backticks):
+{"gesamtnote":<1-5>,"zusammenfassung":"<2-3 Sätze>","kategorien":[{"name":"Öffnung & Rapport","score":<1-5>,"feedback":"<text>","beispiel":"<zitat>"},{"name":"Pain Discovery","score":<1-5>,"feedback":"<text>","beispiel":"<zitat>"},{"name":"Fragetechnik","score":<1-5>,"feedback":"<text>","beispiel":"<zitat>"},{"name":"WITY-Haltung","score":<1-5>,"feedback":"<text>","beispiel":"<zitat>"},{"name":"Business Impact","score":<1-5>,"feedback":"<text>","beispiel":"<zitat>"},{"name":"Nächster Schritt","score":<1-5>,"feedback":"<text>","beispiel":"<zitat>"}],"topTipp":"<text>","hiddenPainEntdeckt":<true/false>,"hiddenPainKommentar":"<text>"}`;
+
+let currentPersona=null, messages=[], turnCount=0, isLoading=false;
+
+async function callAPI(system, msgs, maxTokens=700) {
+  const res = await fetch('/api/messages', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:maxTokens, system, messages:msgs })
+  });
+  if (!res.ok) { const e=await res.json(); throw new Error(e.error?.message||'API-Fehler'); }
+  const data = await res.json();
+  return data.content?.map(c=>c.text||'').join('')||'';
+}
+
+function buildPersonaGrid() {
+  const grid = document.getElementById('persona-grid');
+  PERSONAS.forEach(p => {
+    const card = document.createElement('div');
+    card.className='persona-card'; card.onclick=()=>startChat(p);
+    card.innerHTML=`<div class="top-bar"></div>
+      <div class="card-header"><div><h3>${p.name}</h3><p class="sub">${p.role} · ${p.company}</p></div><span class="diff-badge" style="background:${p.diffColor}">${p.difficulty}</span></div>
+      <p class="context">${p.context.substring(0,155)}…</p>
+      <div class="tags">${p.triggers.map(t=>`<span class="tag-pill">${t}</span>`).join('')}</div>
+      <div class="card-footer"><span class="start-link">Gespräch starten →</span><span class="industry">${p.industry}</span></div>`;
+    grid.appendChild(card);
+  });
+}
+
+function showScreen(name) {
+  ['select','chat','feedback'].forEach(s => {
+    const el=document.getElementById(s+'-screen');
+    el.style.display = s===name ? (s==='chat'?'flex':'block') : 'none';
+  });
+}
+function showSelect(){showScreen('select');}
+
+async function startChat(p) {
+  currentPersona=p; messages=[]; turnCount=0;
+  document.getElementById('chat-name').textContent=p.name;
+  document.getElementById('chat-diff-badge').textContent=p.difficulty;
+  document.getElementById('chat-diff-badge').style.background=p.diffColor;
+  document.getElementById('chat-role').textContent=p.role+' · '+p.company;
+  document.getElementById('messages-list').innerHTML='';
+  document.getElementById('chat-error').style.display='none';
+  document.getElementById('feedback-btn').style.display='none';
+  document.getElementById('bottom-feedback-btn').style.display='none';
+  document.getElementById('round-counter').textContent='Runde 0/12';
+  showScreen('chat'); setLoading(true);
+
+  const sys=`${SYS_BASE}\n\nPERSONA:\nName: ${p.name}\nRolle: ${p.role}\nUnternehmen: ${p.company}\nKontext: ${p.context}\nPersönlichkeit: ${p.personality}\nHidden Pain: ${p.hiddenPain}`;
+  try {
+    const text=await callAPI(sys,[{role:'user',content:'Gespräch beginnt. Begrüße den Seller zum vereinbarten 30-Min-Termin. 2-3 Sätze.'}]);
+    messages.push({role:'persona',text}); addMessage('persona',text);
+  } catch(e){showError('Verbindungsfehler: '+e.message);}
+  setLoading(false);
+}
+
+async function sendMessage() {
+  const input=document.getElementById('msg-input');
+  const txt=input.value.trim(); if(!txt||isLoading)return;
+  input.value=''; messages.push({role:'seller',text:txt}); addMessage('seller',txt);
+  turnCount++; document.getElementById('round-counter').textContent=`Runde ${turnCount}/12`;
+  if(turnCount>=3){document.getElementById('feedback-btn').style.display='block';document.getElementById('bottom-feedback-btn').style.display='block';}
+  setLoading(true);
+  const p=currentPersona;
+  const sys=`${SYS_BASE}\n\nPERSONA:\nName: ${p.name}\nRolle: ${p.role}\nUnternehmen: ${p.company}\nKontext: ${p.context}\nPersönlichkeit: ${p.personality}\nHidden Pain: ${p.hiddenPain}\n\nRunde ${turnCount}.${turnCount>=8?' Bitte auf Next Step hinweisen falls keiner kommt.':''}`;
+  const apiMsgs=[{role:'user',content:'Gespräch beginnt.'},{role:'assistant',content:messages[0].text}];
+  for(let i=1;i<messages.length;i++) apiMsgs.push({role:messages[i].role==='seller'?'user':'assistant',content:messages[i].text});
+  try {
+    const text=await callAPI(sys,apiMsgs); messages.push({role:'persona',text}); addMessage('persona',text);
+  } catch(e){showError('Fehler: '+e.message);}
+  setLoading(false);
+}
+
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
+function restartChat(){startChat(currentPersona);}
+
+async function requestFeedback() {
+  showScreen('feedback');
+  document.getElementById('feedback-meta').textContent=`Gespräch mit ${currentPersona.name}, ${currentPersona.role} · ${turnCount} Runden`;
+  document.getElementById('feedback-content').innerHTML='<div class="loading-box"><div class="spinner"></div><p>Gespräch wird analysiert…</p></div>';
+  const transcript=messages.map(m=>m.role==='seller'?`SELLER: ${m.text}`:`KUNDE (${currentPersona.name}): ${m.text}`).join('\n\n');
+  try {
+    const raw=await callAPI(FEEDBACK_SYS,[{role:'user',content:`Persona: ${currentPersona.name}, ${currentPersona.role}\nHidden Pain: ${currentPersona.hiddenPain}\n\n--- TRANSKRIPT ---\n${transcript}\n--- ENDE ---`}],2000);
+    renderFeedback(JSON.parse(raw.replace(/```json|```/g,'').trim()));
+  } catch(e){document.getElementById('feedback-content').innerHTML=`<div style="background:#FFF3F3;padding:20px;border-radius:8px;color:#D32F2F">Fehler: ${e.message}</div>`;}
+}
+
+function renderFeedback(fb) {
+  const nc=fb.gesamtnote>=4?'#2E7D32':fb.gesamtnote>=3?'#FF8F00':'#D32F2F';
+  const nb=fb.gesamtnote>=4?'#E8F5E9':fb.gesamtnote>=3?'#FFF8E1':'#FFEBEE';
+  let html=`<div class="score-card"><div class="score-circle" style="background:${nb};border-color:${nc}"><span style="color:${nc}">${fb.gesamtnote}</span></div><div><h2>Gesamtbewertung</h2><p>${fb.zusammenfassung}</p></div></div><div class="kategorie-list">`;
+  (fb.kategorien||[]).forEach(k=>{
+    const col=k.score>=4?'#2E7D32':k.score>=3?'#FF8F00':'#D32F2F';
+    html+=`<div class="kat-card"><h3>${k.name}</h3><div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:${k.score/5*100}%;background:${col}"></div></div><span class="score-label" style="color:${col}">${k.score}/5</span></div><p class="kat-feedback">${k.feedback}</p>${k.beispiel?`<div class="kat-beispiel">${k.beispiel}</div>`:''}</div>`;
+  });
+  html+=`</div>`;
+  const hc=fb.hiddenPainEntdeckt?'#2E7D32':'#E65100', hb=fb.hiddenPainEntdeckt?'#E8F5E9':'#FFF8E1', hbr=fb.hiddenPainEntdeckt?'#C8E6C9':'#FFE0B2';
+  html+=`<div class="hidden-pain-box" style="background:${hb};border:1px solid ${hbr}"><div class="hp-title" style="color:${hc}">${fb.hiddenPainEntdeckt?'✅':'⚠️'} Hidden Pain ${fb.hiddenPainEntdeckt?'entdeckt!':'nicht entdeckt'}</div><p>${fb.hiddenPainKommentar}</p>${!fb.hiddenPainEntdeckt?`<p style="font-style:italic;color:#888;margin-top:8px">Hidden Pain: ${currentPersona.hiddenPain}</p>`:''}</div>
+  <div class="tipp-card"><div class="tipp-label">WICHTIGSTER TIPP</div><p>${fb.topTipp}</p></div>
+  <div class="action-row"><button class="btn-green" onclick="startChat(currentPersona)">Nochmal mit ${currentPersona.name.split(' ')[0]} üben</button><button class="btn-outline" onclick="showSelect()">Andere Persona wählen</button></div>`;
+  document.getElementById('feedback-content').innerHTML=html;
+}
+
+function addMessage(role, text) {
+  const list=document.getElementById('messages-list');
+  const row=document.createElement('div'); row.className=`message-row ${role}`;
+  row.innerHTML=role==='seller'?`<div class="bubble seller">${esc(text)}</div>`:`<div class="bubble persona"><div class="persona-label">${currentPersona.name}</div>${esc(text)}</div>`;
+  list.appendChild(row);
+  document.getElementById('scroll-anchor').scrollIntoView({behavior:'smooth'});
+}
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+function setLoading(v){isLoading=v;document.getElementById('typing-indicator').style.display=v?'flex':'none';document.getElementById('msg-input').disabled=v;document.getElementById('send-btn').disabled=v;document.getElementById('send-btn').style.background=v?'#CCC':'#2E7D32';if(!v)document.getElementById('msg-input').focus();if(v)document.getElementById('scroll-anchor').scrollIntoView({behavior:'smooth'});}
+function showError(msg){const el=document.getElementById('chat-error');el.textContent=msg;el.style.display='block';}
+
+buildPersonaGrid();
+</script>
+</body>
+</html>
